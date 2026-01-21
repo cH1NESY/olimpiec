@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/olimpiec/app" isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/olimpiec/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />
+      <sourceFolder url="file://$MODULE_DIR$/olimpiec/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
+      <sourceFolder url="file://$MODULE_DIR$/olimpiec/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/olimpiec/tests" isTestSource="true" packagePrefix="Tests\" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/brick/math" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/carbonphp/carbon-doctrine-types" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/dflydev/dot-access-data" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/doctrine/inflector" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/doctrine/lexer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/dragonmantank/cron-expression" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/egulias/email-validator" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/fakerphp/faker" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/filp/whoops" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/fruitcake/php-cors" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/graham-campbell/result-type" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/guzzlehttp/guzzle" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/guzzlehttp/promises" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/guzzlehttp/psr7" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/guzzlehttp/uri-template" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/hamcrest/hamcrest-php" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/framework" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/pail" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/pint" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/prompts" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/sail" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/serializable-closure" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/tinker" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/commonmark" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/config" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/flysystem" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/flysystem-local" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/mime-type-detection" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/uri" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/league/uri-interfaces" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/mockery/mockery" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/monolog/monolog" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/myclabs/deep-copy" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nesbot/carbon" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nette/schema" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nette/utils" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nikic/php-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nunomaduro/collision" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/nunomaduro/termwind" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phar-io/manifest" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phar-io/version" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpoption/phpoption" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/php-code-coverage" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/php-file-iterator" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/php-invoker" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/php-text-template" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/php-timer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/phpunit/phpunit" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/container" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/http-client" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/http-factory" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/http-message" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/log" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/psy/psysh" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/ralouphie/getallheaders" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/ramsey/collection" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/ramsey/uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/cli-parser" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/code-unit" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/code-unit-reverse-lookup" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/comparator" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/complexity" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/diff" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/environment" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/exporter" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/global-state" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/lines-of-code" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/object-enumerator" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/object-reflector" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/recursion-context" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/type" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/sebastian/version" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/staabm/side-effects-detector" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/clock" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/console" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/css-selector" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/deprecation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/error-handler" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/event-dispatcher" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/event-dispatcher-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/finder" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/http-foundation" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/http-kernel" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/mailer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/mime" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-ctype" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-intl-grapheme" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-intl-idn" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-intl-normalizer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-mbstring" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-php80" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-php83" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-php84" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-php85" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/polyfill-uuid" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/process" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/routing" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/service-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/string" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/translation" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/translation-contracts" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/uid" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/var-dumper" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/symfony/yaml" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/theseer/tokenizer" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/tijsverkoyen/css-to-inline-styles" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/vlucas/phpdotenv" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/voku/portable-ascii" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

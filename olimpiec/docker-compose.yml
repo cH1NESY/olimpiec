@@ -1,0 +1,93 @@
+networks:
+  custom_network:
+    driver: bridge
+
+
+services:
+  web:
+    image: nginx
+    container_name: nginx-olimp
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"  # Проброс на локальный порт 8080 для проксирования через системный Nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www/html
+      - ../frontend/dist:/var/www/html/frontend/dist:ro
+    networks:
+      - custom_network
+    depends_on:
+      - php-fpm
+      - postgres
+
+  php-fpm:
+    container_name: php-fpm-olimp
+    build: ./docker/php
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-xdebug.ini
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    networks:
+      - custom_network
+    depends_on:
+      - postgres
+
+
+  postgres:
+    image: postgres:13.1
+    container_name: postgres-olimp
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - custom_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-olimp
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-password}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - custom_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend-olimpiec
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5173:80"  # Frontend на порту 5173
+    networks:
+      - custom_network
+    depends_on:
+      - web
+
+volumes:
+  rabbitmq_data:

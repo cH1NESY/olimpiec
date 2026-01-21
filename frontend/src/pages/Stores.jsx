@@ -1,0 +1,119 @@
+import { useState, useEffect } from 'react'
+import { getStores } from '../api/api'
+import './Stores.css'
+
+const Stores = () => {
+  const [stores, setStores] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    loadStores()
+  }, [])
+
+  const loadStores = async () => {
+    setLoading(true)
+    try {
+      const data = await getStores()
+      setStores(data.data || data || [])
+    } catch (error) {
+      console.error('Error loading stores:', error)
+      // Mock data for development
+      setStores([
+        {
+          id: 1,
+          name: 'Олимпиец - Центральный',
+          address: 'г. Москва, ул. Тверская, д. 10',
+          phone: '+7 (495) 123-45-67',
+          email: 'central@olimpiec.ru',
+          hours: 'Пн-Вс: 10:00 - 22:00',
+          coordinates: { lat: 55.7558, lng: 37.6173 }
+        },
+        {
+          id: 2,
+          name: 'Олимпиец - Северный',
+          address: 'г. Москва, Ленинградский пр-т, д. 50',
+          phone: '+7 (495) 234-56-78',
+          email: 'north@olimpiec.ru',
+          hours: 'Пн-Вс: 10:00 - 22:00',
+          coordinates: { lat: 55.7934, lng: 37.5500 }
+        },
+        {
+          id: 3,
+          name: 'Олимпиец - Южный',
+          address: 'г. Москва, ул. Варшавское шоссе, д. 100',
+          phone: '+7 (495) 345-67-89',
+          email: 'south@olimpiec.ru',
+          hours: 'Пн-Вс: 10:00 - 22:00',
+          coordinates: { lat: 55.6226, lng: 37.6064 }
+        }
+      ])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return <div className="loading">Загрузка...</div>
+  }
+
+  return (
+    <div className="stores-page">
+      <div className="container">
+        <h1 className="stores-title">Наши магазины</h1>
+        <p className="stores-subtitle">
+          Выберите удобный магазин для самовывоза или посетите нас лично
+        </p>
+        <div className="stores-grid">
+          {stores.map(store => (
+            <div key={store.id} className="store-card">
+              <div className="store-header">
+                <h2 className="store-name">{store.name}</h2>
+              </div>
+              <div className="store-info">
+                <div className="store-detail">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                  </svg>
+                  <span>{store.address}</span>
+                </div>
+                <div className="store-detail">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                  </svg>
+                  <span>{store.phone}</span>
+                </div>
+                <div className="store-detail">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                  <span>{store.email}</span>
+                </div>
+                <div className="store-detail">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>{store.hours}</span>
+                </div>
+              </div>
+              <div className="store-actions">
+                <a 
+                  href={`https://yandex.ru/maps/?pt=${store.coordinates?.lng},${store.coordinates?.lat}&z=15`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-outline"
+                >
+                  Открыть на карте
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Stores
