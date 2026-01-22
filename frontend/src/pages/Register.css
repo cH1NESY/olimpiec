@@ -1,0 +1,120 @@
+.register-page {
+  padding: 100px 0 60px;
+  min-height: calc(100vh - 200px);
+  display: flex;
+  align-items: center;
+}
+
+.register-content {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.register-card {
+  background: linear-gradient(135deg, var(--white) 0%, var(--bg-blue-light) 100%);
+  border: 2px solid var(--primary-blue-light);
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.register-title {
+  font-size: 32px;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.register-subtitle {
+  color: var(--gray);
+  text-align: center;
+  margin-bottom: 32px;
+  font-size: 16px;
+}
+
+.error-message {
+  background-color: var(--bg-red-light);
+  color: var(--accent-red-dark);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  border: 1px solid var(--accent-red);
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-dark);
+}
+
+.form-group input {
+  padding: 12px 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 16px;
+  transition: all 0.2s;
+  background-color: var(--white);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.register-footer {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--gray);
+  font-size: 14px;
+}
+
+.register-footer a {
+  color: var(--primary-blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.register-footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .register-page {
+    padding: 80px 20px 40px;
+  }
+
+  .register-card {
+    padding: 32px 24px;
+  }
+}

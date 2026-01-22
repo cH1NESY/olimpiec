@@ -1,9 +1,14 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../../context/CartContext'
+import { useFavorites } from '../../context/FavoritesContext'
 import './ProductCard.css'
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart()
+  const { toggleFavorite, isFavorite } = useFavorites()
+  const [showHeart, setShowHeart] = useState(false)
+  const favorite = isFavorite(product.id)
 
   const handleAddToCart = (e) => {
     e.preventDefault()
@@ -11,17 +16,48 @@ const ProductCard = ({ product }) => {
     addToCart(product)
   }
 
+  const handleToggleFavorite = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    toggleFavorite(product)
+  }
+
+  // Get first image from API response
+  const getProductImage = () => {
+    if (product.images && product.images.length > 0) {
+      const firstImage = product.images[0]
+      return typeof firstImage === 'string' 
+        ? firstImage 
+        : (firstImage.image_path || firstImage.url || firstImage.path)
+    }
+    return product.image || '/api/placeholder/300/300'
+  }
+
   return (
-    <Link to={`/product/${product.id}`} className="product-card">
+    <Link 
+      to={`/product/${product.id}`} 
+      className="product-card"
+      onMouseEnter={() => setShowHeart(true)}
+      onMouseLeave={() => setShowHeart(false)}
+    >
       <div className="product-image-wrapper">
         <img 
-          src={product.image || '/api/placeholder/300/300'} 
+          src={getProductImage()} 
           alt={product.name}
           className="product-image"
           onError={(e) => {
             e.target.src = 'https://via.placeholder.com/300x300?text=No+Image'
           }}
         />
+        <button
+          className={`favorite-btn ${showHeart || favorite ? 'show' : ''} ${favorite ? 'active' : ''}`}
+          onClick={handleToggleFavorite}
+          aria-label={favorite ? 'Удалить из избранного' : 'Добавить в избранное'}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill={favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
       </div>
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>

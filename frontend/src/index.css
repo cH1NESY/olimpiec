@@ -5,18 +5,46 @@
 }
 
 :root {
+  /* Основные цвета из логотипа */
   --primary-blue: #1e40af;
   --primary-blue-dark: #1e3a8a;
   --primary-blue-light: #3b82f6;
   --accent-blue: #2563eb;
+  
+  /* Дополнительные акцентные цвета из логотипа */
+  --accent-yellow: #fbbf24;
+  --accent-yellow-light: #fcd34d;
+  --accent-yellow-dark: #f59e0b;
+  --accent-red: #dc2626;
+  --accent-red-light: #ef4444;
+  --accent-red-dark: #b91c1c;
+  
+  /* Нейтральные цвета */
   --white: #ffffff;
   --gray-light: #f8fafc;
   --gray: #64748b;
   --gray-dark: #334155;
+  --gray-darker: #1e293b;
   --border-color: #e2e8f0;
+  
+  /* Фоны для категорий и акцентов */
+  --bg-yellow-light: #fef3c7;
+  --bg-red-light: #fee2e2;
+  --bg-blue-light: #dbeafe;
+  
+  /* Градиенты */
+  --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+  --gradient-accent-yellow: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-light) 100%);
+  --gradient-accent-red: linear-gradient(135deg, var(--accent-red) 0%, var(--accent-red-light) 100%);
+  --gradient-soft: linear-gradient(135deg, var(--primary-blue-light) 0%, var(--accent-blue) 100%);
+  
+  /* Тени */
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-colored: 0 4px 6px -1px rgba(30, 64, 175, 0.2), 0 2px 4px -1px rgba(30, 64, 175, 0.1);
+  --shadow-yellow: 0 4px 6px -1px rgba(251, 191, 36, 0.3), 0 2px 4px -1px rgba(251, 191, 36, 0.2);
+  --shadow-red: 0 4px 6px -1px rgba(220, 38, 38, 0.3), 0 2px 4px -1px rgba(220, 38, 38, 0.2);
 }
 
 body {
@@ -84,7 +112,9 @@ input, textarea, select {
 }
 
 .btn-secondary:hover {
-  background-color: var(--gray-light);
+  background: var(--gradient-primary);
+  color: var(--white);
+  border-color: transparent;
 }
 
 .btn-outline {
@@ -94,8 +124,10 @@ input, textarea, select {
 }
 
 .btn-outline:hover {
-  background-color: var(--primary-blue);
+  background: var(--gradient-primary);
   color: var(--white);
+  border-color: transparent;
+  box-shadow: var(--shadow-colored);
 }
 
 .loading {

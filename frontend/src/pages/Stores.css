@@ -6,7 +6,10 @@
 .stores-title {
   font-size: 36px;
   font-weight: 700;
-  color: var(--primary-blue);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 12px;
   text-align: center;
 }
@@ -25,19 +28,38 @@
 }
 
 .store-card {
-  background-color: var(--white);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, var(--white) 0%, var(--bg-blue-light) 100%);
+  border: 2px solid var(--border-color);
   border-radius: 8px;
   padding: 32px;
   display: flex;
   flex-direction: column;
   gap: 24px;
-  transition: all 0.2s;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.store-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s;
 }
 
 .store-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-colored);
   border-color: var(--primary-blue);
+  transform: translateY(-4px);
+}
+
+.store-card:hover::before {
+  transform: scaleX(1);
 }
 
 .store-header {

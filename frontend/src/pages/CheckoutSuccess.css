@@ -19,20 +19,24 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: #d1fae5;
-  color: #065f46;
+  background: var(--gradient-accent-yellow);
+  color: var(--white);
   font-size: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
   font-weight: 700;
+  box-shadow: var(--shadow-yellow);
 }
 
 .success-title {
   font-size: 32px;
   font-weight: 700;
-  color: var(--primary-blue);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 16px;
 }
 

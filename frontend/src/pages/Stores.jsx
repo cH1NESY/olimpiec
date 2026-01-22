@@ -13,40 +13,11 @@ const Stores = () => {
   const loadStores = async () => {
     setLoading(true)
     try {
-      const data = await getStores()
-      setStores(data.data || data || [])
+      const response = await getStores()
+      setStores(response.data || [])
     } catch (error) {
       console.error('Error loading stores:', error)
-      // Mock data for development
-      setStores([
-        {
-          id: 1,
-          name: 'Олимпиец - Центральный',
-          address: 'г. Москва, ул. Тверская, д. 10',
-          phone: '+7 (495) 123-45-67',
-          email: 'central@olimpiec.ru',
-          hours: 'Пн-Вс: 10:00 - 22:00',
-          coordinates: { lat: 55.7558, lng: 37.6173 }
-        },
-        {
-          id: 2,
-          name: 'Олимпиец - Северный',
-          address: 'г. Москва, Ленинградский пр-т, д. 50',
-          phone: '+7 (495) 234-56-78',
-          email: 'north@olimpiec.ru',
-          hours: 'Пн-Вс: 10:00 - 22:00',
-          coordinates: { lat: 55.7934, lng: 37.5500 }
-        },
-        {
-          id: 3,
-          name: 'Олимпиец - Южный',
-          address: 'г. Москва, ул. Варшавское шоссе, д. 100',
-          phone: '+7 (495) 345-67-89',
-          email: 'south@olimpiec.ru',
-          hours: 'Пн-Вс: 10:00 - 22:00',
-          coordinates: { lat: 55.6226, lng: 37.6064 }
-        }
-      ])
+      setStores([])
     } finally {
       setLoading(false)
     }
@@ -95,12 +66,12 @@ const Stores = () => {
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
-                  <span>{store.hours}</span>
+                  <span>{store.working_hours || store.hours}</span>
                 </div>
               </div>
               <div className="store-actions">
                 <a 
-                  href={`https://yandex.ru/maps/?pt=${store.coordinates?.lng},${store.coordinates?.lat}&z=15`}
+                  href={`https://yandex.ru/maps/?pt=${store.longitude || store.coordinates?.lng},${store.latitude || store.coordinates?.lat}&z=15`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline"

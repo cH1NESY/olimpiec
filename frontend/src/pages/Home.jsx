@@ -29,11 +29,6 @@ const Home = () => {
               <p className="feature-text">Доставка по всей стране в кратчайшие сроки</p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">✅</div>
-              <h3 className="feature-title">Гарантия качества</h3>
-              <p className="feature-text">Только оригинальная продукция с гарантией</p>
-            </div>
-            <div className="feature-card">
               <div className="feature-icon">🏪</div>
               <h3 className="feature-title">Самовывоз</h3>
               <p className="feature-text">Заберите заказ в ближайшем магазине</p>
@@ -51,21 +46,29 @@ const Home = () => {
         <div className="container">
           <h2 className="section-title">Популярные категории</h2>
           <div className="categories-grid">
-            <Link to="/catalog/футбол" className="category-card">
-              <div className="category-icon">⚽</div>
-              <h3 className="category-name">Футбол</h3>
+            <Link to="/catalog/komplekty" className="category-card">
+              <div className="category-icon">👕</div>
+              <h3 className="category-name">Комплекты</h3>
             </Link>
-            <Link to="/catalog/баскетбол" className="category-card">
-              <div className="category-icon">🏀</div>
-              <h3 className="category-name">Баскетбол</h3>
+            <Link to="/catalog/sportivnye-kostyumy" className="category-card">
+              <div className="category-icon">👔</div>
+              <h3 className="category-name">Спортивные костюмы</h3>
             </Link>
-            <Link to="/catalog/бег" className="category-card">
-              <div className="category-icon">🏃</div>
-              <h3 className="category-name">Бег</h3>
+            <Link to="/catalog/kurtki" className="category-card">
+              <div className="category-icon">🧥</div>
+              <h3 className="category-name">Куртки</h3>
             </Link>
-            <Link to="/catalog/фитнес" className="category-card">
-              <div className="category-icon">💪</div>
-              <h3 className="category-name">Фитнес</h3>
+            <Link to="/catalog/futbolki" className="category-card">
+              <div className="category-icon">👕</div>
+              <h3 className="category-name">Футболки</h3>
+            </Link>
+            <Link to="/catalog/sportivnye-bryuki" className="category-card">
+              <div className="category-icon">👖</div>
+              <h3 className="category-name">Спортивные брюки</h3>
+            </Link>
+            <Link to="/catalog/borcovki" className="category-card">
+              <div className="category-icon">👟</div>
+              <h3 className="category-name">Борцовки</h3>
             </Link>
           </div>
         </div>

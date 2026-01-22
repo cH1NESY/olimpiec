@@ -6,7 +6,6 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductCharacteristic;
-use App\Models\ProductImage;
 use App\Models\Size;
 use Illuminate\Database\Seeder;
 
@@ -22,58 +21,83 @@ class ProductSeeder extends Seeder
         $puma = Brand::where('slug', 'puma')->first();
         $reebok = Brand::where('slug', 'reebok')->first();
         
-        $footballUniform = Category::where('slug', 'football-uniform')->first();
-        $footballBalls = Category::where('slug', 'football-balls')->first();
-        $footballBoots = Category::where('slug', 'football-boots')->first();
-        $basketballUniform = Category::where('slug', 'basketball-uniform')->first();
-        $basketballShoes = Category::where('slug', 'basketball-shoes')->first();
-        $runningShoes = Category::where('slug', 'running-shoes')->first();
-        $dumbbells = Category::where('slug', 'dumbbells')->first();
+        // Новые категории
+        $futbolki = Category::where('slug', 'futbolki')->first();
+        $sportivnyeKostyumy = Category::where('slug', 'sportivnye-kostyumy')->first();
+        $komplekty = Category::where('slug', 'komplekty')->first();
+        $kurtki = Category::where('slug', 'kurtki')->first();
+        $kurtkiZima = Category::where('slug', 'kurtki-zima')->first();
+        $sportivnyeBryuki = Category::where('slug', 'sportivnye-bryuki')->first();
+        $shorty = Category::where('slug', 'shorty')->first();
+        $borcovki = Category::where('slug', 'borcovki')->first();
+        $koftyVetrovki = Category::where('slug', 'kofty-vetrovki')->first();
+        $zhilety = Category::where('slug', 'zhilety')->first();
+        $shapki = Category::where('slug', 'shapki')->first();
+        $sumkiRyukzaki = Category::where('slug', 'sumki-ryukzaki')->first();
 
         $sizes = Size::where('type', 'clothing')->get();
         $shoeSizes = Size::where('type', 'shoes')->get();
 
-        // Футбольные мячи
-        $this->createFootballBall('Футбольный мяч Nike Strike', 'football-ball-nike-strike', $nike, $footballBalls, 2500, 3000, false);
-        $this->createFootballBall('Футбольный мяч Adidas Tiro', 'football-ball-adidas-tiro', $adidas, $footballBalls, 2200, null, true);
-        $this->createFootballBall('Футбольный мяч Puma Future', 'football-ball-puma-future', $puma, $footballBalls, 2000, null, false);
+        // Футболки
+        $this->createTShirt('Футболка Nike Dri-FIT', 'futbolka-nike-dri-fit', $nike, $futbolki, 1500, null, true, $sizes);
+        $this->createTShirt('Футболка Adidas Climalite', 'futbolka-adidas-climalite', $adidas, $futbolki, 1400, null, false, $sizes);
+        $this->createTShirt('Футболка Puma Dry Cell', 'futbolka-puma-dry-cell', $puma, $futbolki, 1300, null, false, $sizes);
 
-        // Футбольная форма
-        $this->createFootballUniform('Футбольная форма Adidas', 'football-uniform-adidas', $adidas, $footballUniform, 3500, null, true, $sizes);
-        $this->createFootballUniform('Футбольная форма Nike', 'football-uniform-nike', $nike, $footballUniform, 4200, 5000, false, $sizes);
-        $this->createFootballUniform('Футбольная форма Puma', 'football-uniform-puma', $puma, $footballUniform, 3200, null, false, $sizes);
+        // Спортивные костюмы
+        $this->createSuit('Спортивный костюм Nike', 'sportivnyj-kostyum-nike', $nike, $sportivnyeKostyumy, 5500, 6500, true, $sizes);
+        $this->createSuit('Спортивный костюм Adidas', 'sportivnyj-kostyum-adidas', $adidas, $sportivnyeKostyumy, 5200, null, false, $sizes);
+        $this->createSuit('Спортивный костюм Puma', 'sportivnyj-kostyum-puma', $puma, $sportivnyeKostyumy, 4800, null, false, $sizes);
 
-        // Футбольные бутсы
-        $this->createFootballBoots('Бутсы Nike Mercurial', 'football-boots-nike-mercurial', $nike, $footballBoots, 8500, 10000, true, $shoeSizes);
-        $this->createFootballBoots('Бутсы Adidas Predator', 'football-boots-adidas-predator', $adidas, $footballBoots, 9000, null, false, $shoeSizes);
-        $this->createFootballBoots('Бутсы Puma Future', 'football-boots-puma-future', $puma, $footballBoots, 7500, null, false, $shoeSizes);
+        // Комплекты
+        $this->createSet('Комплект спортивный Nike', 'komplekt-sportivnyj-nike', $nike, $komplekty, 4500, null, true, $sizes);
+        $this->createSet('Комплект спортивный Adidas', 'komplekt-sportivnyj-adidas', $adidas, $komplekty, 4200, null, false, $sizes);
 
-        // Баскетбольная форма
-        $this->createBasketballUniform('Баскетбольная форма Nike', 'basketball-uniform-nike', $nike, $basketballUniform, 4500, null, true, $sizes);
-        $this->createBasketballUniform('Баскетбольная форма Adidas', 'basketball-uniform-adidas', $adidas, $basketballUniform, 4000, null, false, $sizes);
+        // Куртки
+        $this->createJacket('Куртка спортивная Nike', 'kurtka-sportivnaya-nike', $nike, $kurtki, 6500, null, true, $sizes);
+        $this->createJacket('Куртка спортивная Adidas', 'kurtka-sportivnaya-adidas', $adidas, $kurtki, 6200, null, false, $sizes);
+        $this->createJacket('Куртка спортивная Puma', 'kurtka-sportivnaya-puma', $puma, $kurtki, 5800, null, false, $sizes);
 
-        // Баскетбольные кроссовки
-        $this->createBasketballShoes('Кроссовки Nike Air Jordan', 'basketball-shoes-nike-jordan', $nike, $basketballShoes, 12000, 15000, true, $shoeSizes);
-        $this->createBasketballShoes('Кроссовки Adidas Harden', 'basketball-shoes-adidas-harden', $adidas, $basketballShoes, 11000, null, false, $shoeSizes);
+        // Зимние куртки
+        $this->createWinterJacket('Зимняя куртка Nike', 'zimnyaya-kurtka-nike', $nike, $kurtkiZima, 8500, 10000, true, $sizes);
+        $this->createWinterJacket('Зимняя куртка Adidas', 'zimnyaya-kurtka-adidas', $adidas, $kurtkiZima, 8200, null, false, $sizes);
 
-        // Беговые кроссовки
-        $this->createRunningShoes('Беговые кроссовки Nike Air Max', 'running-shoes-nike-air-max', $nike, $runningShoes, 8500, 10000, true, $shoeSizes);
-        $this->createRunningShoes('Беговые кроссовки Adidas Ultraboost', 'running-shoes-adidas-ultraboost', $adidas, $runningShoes, 9500, null, false, $shoeSizes);
-        $this->createRunningShoes('Беговые кроссовки Puma Speedcat', 'running-shoes-puma-speedcat', $puma, $runningShoes, 7000, null, false, $shoeSizes);
+        // Спортивные брюки
+        $this->createPants('Спортивные брюки Nike', 'sportivnye-bryuki-nike', $nike, $sportivnyeBryuki, 3500, null, true, $sizes);
+        $this->createPants('Спортивные брюки Adidas', 'sportivnye-bryuki-adidas', $adidas, $sportivnyeBryuki, 3200, null, false, $sizes);
+        $this->createPants('Спортивные брюки Puma', 'sportivnye-bryuki-puma', $puma, $sportivnyeBryuki, 3000, null, false, $sizes);
 
-        // Гантели
-        $this->createDumbbells('Гантели 5кг (пара)', 'dumbbells-5kg', $dumbbells, 1800, null, false);
-        $this->createDumbbells('Гантели 10кг (пара)', 'dumbbells-10kg', $dumbbells, 3200, null, false);
-        $this->createDumbbells('Гантели 15кг (пара)', 'dumbbells-15kg', $dumbbells, 4500, null, true);
+        // Шорты
+        $this->createShorts('Шорты спортивные Nike', 'shorty-sportivnye-nike', $nike, $shorty, 2500, null, true, $sizes);
+        $this->createShorts('Шорты спортивные Adidas', 'shorty-sportivnye-adidas', $adidas, $shorty, 2300, null, false, $sizes);
+
+        // Борцовки
+        $this->createWrestlingShoes('Борцовки Nike', 'borcovki-nike', $nike, $borcovki, 4500, null, true, $shoeSizes);
+        $this->createWrestlingShoes('Борцовки Adidas', 'borcovki-adidas', $adidas, $borcovki, 4200, null, false, $shoeSizes);
+
+        // Кофты и ветровки
+        $this->createSweater('Ветровка Nike', 'vetrovka-nike', $nike, $koftyVetrovki, 4000, null, true, $sizes);
+        $this->createSweater('Кофта Adidas', 'kofta-adidas', $adidas, $koftyVetrovki, 3800, null, false, $sizes);
+
+        // Жилеты
+        $this->createVest('Жилет спортивный Nike', 'zhilet-sportivnyj-nike', $nike, $zhilety, 2800, null, false, $sizes);
+        $this->createVest('Жилет спортивный Adidas', 'zhilet-sportivnyj-adidas', $adidas, $zhilety, 2600, null, true, $sizes);
+
+        // Шапки
+        $this->createHat('Шапка спортивная Nike', 'shapka-sportivnaya-nike', $nike, $shapki, 1200, null, false);
+        $this->createHat('Шапка спортивная Adidas', 'shapka-sportivnaya-adidas', $adidas, $shapki, 1100, null, true);
+
+        // Сумки и рюкзаки
+        $this->createBag('Рюкзак спортивный Nike', 'ryukzak-sportivnyj-nike', $nike, $sumkiRyukzaki, 3500, null, true);
+        $this->createBag('Сумка спортивная Adidas', 'sumka-sportivnaya-adidas', $adidas, $sumkiRyukzaki, 2800, null, false);
     }
 
-    private function createFootballBall($name, $slug, $brand, $category, $price, $oldPrice, $isNew)
+    private function createTShirt($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Профессиональный футбольный мяч для игры на любом покрытии',
-            'full_description' => 'Футбольный мяч изготовлен из высококачественных материалов. Идеально подходит для тренировок и игр на любом покрытии. Отличное сцепление и контроль.',
+            'description' => 'Спортивная футболка из дышащих материалов',
+            'full_description' => 'Футболка обеспечивает отличную вентиляцию и комфорт во время тренировок. Быстро сохнет и не впитывает влагу.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
@@ -81,55 +105,85 @@ class ProductSeeder extends Seeder
             'gender' => 'unisex',
             'is_new' => $isNew,
             'is_active' => true,
-            'stock_quantity' => rand(20, 100),
+            'stock_quantity' => rand(20, 80),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(35, 50) / 10, 2),
-            'reviews_count' => rand(5, 50),
-            'sales_count' => rand(10, 200),
+            'rating' => round(rand(40, 50) / 10, 2),
+            'reviews_count' => rand(15, 100),
+            'sales_count' => rand(30, 200),
         ]);
 
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Синтетическая кожа', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Размер', 'value' => '5', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Вес', 'value' => '410-450 г', 'sort_order' => 3]);
+        foreach ($sizes->take(6) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(3, 12)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Технология', 'value' => 'Dri-FIT/Climalite', 'sort_order' => 2]);
     }
 
-    private function createFootballUniform($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
+    private function createSuit($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Комплект футбольной формы для тренировок и игр',
-            'full_description' => 'Современная футбольная форма из дышащих материалов. В комплект входит футболка и шорты. Отличная вентиляция и комфорт.',
+            'description' => 'Спортивный костюм для тренировок',
+            'full_description' => 'Спортивный костюм из качественных материалов. В комплект входит куртка и брюки. Идеален для занятий спортом.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
             'brand_id' => $brand->id,
-            'gender' => 'male',
+            'gender' => 'unisex',
             'is_new' => $isNew,
             'is_active' => true,
             'stock_quantity' => rand(15, 50),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(40, 50) / 10, 2),
-            'reviews_count' => rand(10, 80),
-            'sales_count' => rand(20, 150),
+            'rating' => round(rand(42, 50) / 10, 2),
+            'reviews_count' => rand(20, 120),
+            'sales_count' => rand(40, 180),
         ]);
 
-        foreach ($sizes->take(5) as $size) {
-            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 10)]);
+        foreach ($sizes->take(6) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 8)]);
         }
 
         ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Состав', 'value' => 'Футболка + Шорты', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Уход', 'value' => 'Машинная стирка', 'sort_order' => 3]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Состав', 'value' => 'Куртка + Брюки', 'sort_order' => 2]);
     }
 
-    private function createFootballBoots($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $shoeSizes)
+    private function createSet($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Профессиональные футбольные бутсы',
-            'full_description' => 'Футбольные бутсы обеспечивают отличное сцепление с поверхностью и контроль мяча. Легкие и удобные.',
+            'description' => 'Спортивный комплект',
+            'full_description' => 'Комплект спортивной одежды для тренировок и активного отдыха.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(12, 45),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(38, 48) / 10, 2),
+            'reviews_count' => rand(10, 80),
+            'sales_count' => rand(25, 150),
+        ]);
+
+        foreach ($sizes->take(5) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 6)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+    }
+
+    private function createJacket($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Спортивная куртка',
+            'full_description' => 'Спортивная куртка из качественных материалов. Защищает от ветра и дождя.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
@@ -139,56 +193,26 @@ class ProductSeeder extends Seeder
             'is_active' => true,
             'stock_quantity' => rand(10, 40),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(42, 50) / 10, 2),
+            'rating' => round(rand(40, 50) / 10, 2),
             'reviews_count' => rand(15, 100),
             'sales_count' => rand(30, 200),
         ]);
 
-        foreach ($shoeSizes->whereIn('name', ['40', '41', '42', '43', '44', '45']) as $size) {
-            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 8)]);
-        }
-
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал верха', 'value' => 'Синтетическая кожа', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Подошва', 'value' => 'Резина', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Шипы', 'value' => 'Сменные', 'sort_order' => 3]);
-    }
-
-    private function createBasketballUniform($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
-    {
-        $product = Product::create([
-            'name' => $name,
-            'slug' => $slug,
-            'description' => 'Баскетбольная форма для игры',
-            'full_description' => 'Современная баскетбольная форма из качественных материалов. Комфорт и свобода движений.',
-            'price' => $price,
-            'old_price' => $oldPrice,
-            'category_id' => $category->id,
-            'brand_id' => $brand->id,
-            'gender' => 'unisex',
-            'is_new' => $isNew,
-            'is_active' => true,
-            'stock_quantity' => rand(15, 45),
-            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(38, 48) / 10, 2),
-            'reviews_count' => rand(8, 60),
-            'sales_count' => rand(15, 120),
-        ]);
-
         foreach ($sizes->take(6) as $size) {
-            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 8)]);
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 7)]);
         }
 
         ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Состав', 'value' => 'Футболка + Шорты', 'sort_order' => 2]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Защита', 'value' => 'Ветронепроницаемая', 'sort_order' => 2]);
     }
 
-    private function createBasketballShoes($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $shoeSizes)
+    private function createWinterJacket($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Профессиональные баскетбольные кроссовки',
-            'full_description' => 'Баскетбольные кроссовки с отличной амортизацией и поддержкой. Идеальны для игры на паркете.',
+            'description' => 'Зимняя спортивная куртка',
+            'full_description' => 'Теплая зимняя куртка для занятий спортом в холодное время года. Отличная теплоизоляция.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
@@ -198,27 +222,26 @@ class ProductSeeder extends Seeder
             'is_active' => true,
             'stock_quantity' => rand(8, 35),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(40, 50) / 10, 2),
-            'reviews_count' => rand(20, 150),
-            'sales_count' => rand(50, 300),
+            'rating' => round(rand(42, 50) / 10, 2),
+            'reviews_count' => rand(20, 120),
+            'sales_count' => rand(40, 180),
         ]);
 
-        foreach ($shoeSizes->whereIn('name', ['40', '41', '42', '43', '44', '45', '46']) as $size) {
+        foreach ($sizes->take(6) as $size) {
             $product->sizes()->attach($size->id, ['stock_quantity' => rand(1, 6)]);
         }
 
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал верха', 'value' => 'Кожа + Сетка', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Подошва', 'value' => 'Резина', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Амортизация', 'value' => 'Air/Boost', 'sort_order' => 3]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер + Утеплитель', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Температура', 'value' => 'До -25°C', 'sort_order' => 2]);
     }
 
-    private function createRunningShoes($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $shoeSizes)
+    private function createPants($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Удобные беговые кроссовки',
-            'full_description' => 'Беговые кроссовки обеспечивают максимальный комфорт и поддержку во время бега. Отличная амортизация и вентиляция.',
+            'description' => 'Спортивные брюки',
+            'full_description' => 'Удобные спортивные брюки для тренировок. Эластичный материал обеспечивает свободу движений.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
@@ -226,45 +249,181 @@ class ProductSeeder extends Seeder
             'gender' => 'unisex',
             'is_new' => $isNew,
             'is_active' => true,
-            'stock_quantity' => rand(12, 50),
+            'stock_quantity' => rand(15, 50),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
             'rating' => round(rand(40, 50) / 10, 2),
-            'reviews_count' => rand(25, 200),
-            'sales_count' => rand(40, 250),
+            'reviews_count' => rand(15, 100),
+            'sales_count' => rand(30, 200),
         ]);
 
-        foreach ($shoeSizes->whereIn('name', ['38', '39', '40', '41', '42', '43', '44', '45']) as $size) {
-            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 7)]);
+        foreach ($sizes->take(6) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 8)]);
         }
 
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал верха', 'value' => 'Синтетическая кожа + Сетка', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Подошва', 'value' => 'Резина', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Вес', 'value' => '280-320 г', 'sort_order' => 3]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер + Эластан', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Пояс', 'value' => 'Эластичный', 'sort_order' => 2]);
     }
 
-    private function createDumbbells($name, $slug, $category, $price, $oldPrice, $isNew)
+    private function createShorts($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
     {
         $product = Product::create([
             'name' => $name,
             'slug' => $slug,
-            'description' => 'Набор гантелей для домашних тренировок',
-            'full_description' => 'Прочные чугунные гантели с неопреновым покрытием. Идеально подходят для силовых тренировок дома или в зале.',
+            'description' => 'Спортивные шорты',
+            'full_description' => 'Легкие спортивные шорты для тренировок. Отличная вентиляция и комфорт.',
             'price' => $price,
             'old_price' => $oldPrice,
             'category_id' => $category->id,
+            'brand_id' => $brand->id,
             'gender' => 'unisex',
             'is_new' => $isNew,
             'is_active' => true,
-            'stock_quantity' => rand(20, 80),
+            'stock_quantity' => rand(20, 60),
             'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
-            'rating' => round(rand(35, 48) / 10, 2),
-            'reviews_count' => rand(5, 80),
-            'sales_count' => rand(15, 150),
+            'rating' => round(rand(38, 48) / 10, 2),
+            'reviews_count' => rand(10, 80),
+            'sales_count' => rand(25, 150),
         ]);
 
-        $weight = str_replace(['Гантели ', ' (пара)'], '', $name);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Вес', 'value' => $weight . ' (каждая)', 'sort_order' => 1]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Чугун + Неопрен', 'sort_order' => 2]);
-        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Покрытие', 'value' => 'Неопрен', 'sort_order' => 3]);
+        foreach ($sizes->take(5) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(3, 10)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+    }
+
+    private function createWrestlingShoes($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $shoeSizes)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Борцовки для борьбы',
+            'full_description' => 'Профессиональные борцовки для занятий борьбой. Обеспечивают отличное сцепление с ковром.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(8, 30),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(42, 50) / 10, 2),
+            'reviews_count' => rand(15, 100),
+            'sales_count' => rand(30, 200),
+        ]);
+
+        foreach ($shoeSizes->whereIn('name', ['38', '39', '40', '41', '42', '43', '44', '45']) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(1, 5)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал верха', 'value' => 'Кожа', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Подошва', 'value' => 'Резина', 'sort_order' => 2]);
+    }
+
+    private function createSweater($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Ветровка или кофта',
+            'full_description' => 'Спортивная ветровка или кофта для тренировок и активного отдыха.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(12, 45),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(38, 48) / 10, 2),
+            'reviews_count' => rand(10, 80),
+            'sales_count' => rand(25, 150),
+        ]);
+
+        foreach ($sizes->take(6) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(2, 7)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+    }
+
+    private function createVest($name, $slug, $brand, $category, $price, $oldPrice, $isNew, $sizes)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Спортивный жилет',
+            'full_description' => 'Спортивный жилет для тренировок. Легкий и удобный.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(15, 50),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(35, 45) / 10, 2),
+            'reviews_count' => rand(5, 60),
+            'sales_count' => rand(15, 120),
+        ]);
+
+        foreach ($sizes->take(5) as $size) {
+            $product->sizes()->attach($size->id, ['stock_quantity' => rand(3, 8)]);
+        }
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+    }
+
+    private function createHat($name, $slug, $brand, $category, $price, $oldPrice, $isNew)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Спортивная шапка',
+            'full_description' => 'Теплая спортивная шапка для тренировок в холодное время года.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(25, 80),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(38, 48) / 10, 2),
+            'reviews_count' => rand(8, 70),
+            'sales_count' => rand(20, 140),
+        ]);
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Акрил + Шерсть', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Размер', 'value' => 'Универсальный', 'sort_order' => 2]);
+    }
+
+    private function createBag($name, $slug, $brand, $category, $price, $oldPrice, $isNew)
+    {
+        $product = Product::create([
+            'name' => $name,
+            'slug' => $slug,
+            'description' => 'Спортивная сумка или рюкзак',
+            'full_description' => 'Удобная спортивная сумка или рюкзак для переноски спортивной экипировки.',
+            'price' => $price,
+            'old_price' => $oldPrice,
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'gender' => 'unisex',
+            'is_new' => $isNew,
+            'is_active' => true,
+            'stock_quantity' => rand(10, 40),
+            'sku' => strtoupper(substr($slug, 0, 8)) . '-' . rand(100, 999),
+            'rating' => round(rand(40, 50) / 10, 2),
+            'reviews_count' => rand(12, 90),
+            'sales_count' => rand(30, 160),
+        ]);
+
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Материал', 'value' => 'Полиэстер', 'sort_order' => 1]);
+        ProductCharacteristic::create(['product_id' => $product->id, 'name' => 'Объем', 'value' => '30-40 литров', 'sort_order' => 2]);
     }
 }

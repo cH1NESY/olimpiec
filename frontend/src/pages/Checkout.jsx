@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { createOrder } from '../api/api'
 import './Checkout.css'
 
 const Checkout = () => {
   const { cart, getTotalPrice, deliveryMethod, setDeliveryMethod, clearCart } = useCart()
+  const { user, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -15,6 +17,19 @@ const Checkout = () => {
     address: '',
     comment: ''
   })
+
+  // Auto-fill form with user data if authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        address: user.address || ''
+      }))
+    }
+  }, [isAuthenticated, user])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target

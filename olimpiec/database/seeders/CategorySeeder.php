@@ -12,100 +12,24 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // Главные категории
-        $sport = Category::create([
-            'name' => 'Спорт',
-            'slug' => 'sport',
-            'description' => 'Спортивные товары',
-            'sort_order' => 1,
-        ]);
+        $categories = [
+            ['name' => 'Жилеты', 'slug' => 'zhilety', 'description' => 'Спортивные жилеты', 'sort_order' => 1],
+            ['name' => 'Куртки', 'slug' => 'kurtki', 'description' => 'Спортивные куртки', 'sort_order' => 2],
+            ['name' => 'Спортивные брюки', 'slug' => 'sportivnye-bryuki', 'description' => 'Спортивные брюки', 'sort_order' => 3],
+            ['name' => 'Куртки зима', 'slug' => 'kurtki-zima', 'description' => 'Зимние спортивные куртки', 'sort_order' => 4],
+            ['name' => 'Шапки', 'slug' => 'shapki', 'description' => 'Спортивные шапки', 'sort_order' => 5],
+            ['name' => 'Шорты', 'slug' => 'shorty', 'description' => 'Спортивные шорты', 'sort_order' => 6],
+            ['name' => 'Трико борцовское', 'slug' => 'triko-borcovskoe', 'description' => 'Борцовское трико', 'sort_order' => 7],
+            ['name' => 'Сумки, рюкзаки', 'slug' => 'sumki-ryukzaki', 'description' => 'Спортивные сумки и рюкзаки', 'sort_order' => 8],
+            ['name' => 'Комплекты', 'slug' => 'komplekty', 'description' => 'Спортивные комплекты', 'sort_order' => 9],
+            ['name' => 'Борцовки', 'slug' => 'borcovki', 'description' => 'Борцовки', 'sort_order' => 10],
+            ['name' => 'Кофты, ветровки', 'slug' => 'kofty-vetrovki', 'description' => 'Кофты и ветровки', 'sort_order' => 11],
+            ['name' => 'Спортивные костюмы', 'slug' => 'sportivnye-kostyumy', 'description' => 'Спортивные костюмы', 'sort_order' => 12],
+            ['name' => 'Футболки', 'slug' => 'futbolki', 'description' => 'Спортивные футболки', 'sort_order' => 13],
+        ];
 
-        $football = Category::create([
-            'name' => 'Футбол',
-            'slug' => 'football',
-            'description' => 'Футбольная экипировка',
-            'parent_id' => $sport->id,
-            'sort_order' => 1,
-        ]);
-
-        Category::create([
-            'name' => 'Форма',
-            'slug' => 'football-uniform',
-            'description' => 'Футбольная форма',
-            'parent_id' => $football->id,
-            'sort_order' => 1,
-        ]);
-
-        Category::create([
-            'name' => 'Бутсы',
-            'slug' => 'football-boots',
-            'description' => 'Футбольные бутсы',
-            'parent_id' => $football->id,
-            'sort_order' => 2,
-        ]);
-
-        Category::create([
-            'name' => 'Мячи',
-            'slug' => 'football-balls',
-            'description' => 'Футбольные мячи',
-            'parent_id' => $football->id,
-            'sort_order' => 3,
-        ]);
-
-        $basketball = Category::create([
-            'name' => 'Баскетбол',
-            'slug' => 'basketball',
-            'description' => 'Баскетбольная экипировка',
-            'parent_id' => $sport->id,
-            'sort_order' => 2,
-        ]);
-
-        Category::create([
-            'name' => 'Форма',
-            'slug' => 'basketball-uniform',
-            'description' => 'Баскетбольная форма',
-            'parent_id' => $basketball->id,
-            'sort_order' => 1,
-        ]);
-
-        Category::create([
-            'name' => 'Кроссовки',
-            'slug' => 'basketball-shoes',
-            'description' => 'Баскетбольные кроссовки',
-            'parent_id' => $basketball->id,
-            'sort_order' => 2,
-        ]);
-
-        $running = Category::create([
-            'name' => 'Бег',
-            'slug' => 'running',
-            'description' => 'Товары для бега',
-            'parent_id' => $sport->id,
-            'sort_order' => 3,
-        ]);
-
-        Category::create([
-            'name' => 'Кроссовки',
-            'slug' => 'running-shoes',
-            'description' => 'Беговые кроссовки',
-            'parent_id' => $running->id,
-            'sort_order' => 1,
-        ]);
-
-        $fitness = Category::create([
-            'name' => 'Фитнес',
-            'slug' => 'fitness',
-            'description' => 'Товары для фитнеса',
-            'parent_id' => $sport->id,
-            'sort_order' => 4,
-        ]);
-
-        Category::create([
-            'name' => 'Гантели',
-            'slug' => 'dumbbells',
-            'description' => 'Гантели и штанги',
-            'parent_id' => $fitness->id,
-            'sort_order' => 1,
-        ]);
+        foreach ($categories as $category) {
+            Category::create($category);
+        }
     }
 }

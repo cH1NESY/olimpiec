@@ -84,6 +84,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:5173:80"  # Frontend на порту 5173
+    volumes:
+      - ../frontend/dist:/usr/share/nginx/html:ro
     networks:
       - custom_network
     depends_on:

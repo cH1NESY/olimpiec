@@ -5,7 +5,6 @@
       <sourceFolder url="file://$MODULE_DIR$/olimpiec/app" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/olimpiec/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />
       <sourceFolder url="file://$MODULE_DIR$/olimpiec/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
-      <sourceFolder url="file://$MODULE_DIR$/olimpiec/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/olimpiec/tests" isTestSource="true" packagePrefix="Tests\" />
       <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/brick/math" />
       <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/carbonphp/carbon-doctrine-types" />
@@ -119,6 +118,7 @@
       <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/tijsverkoyen/css-to-inline-styles" />
       <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/vlucas/phpdotenv" />
       <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/voku/portable-ascii" />
+      <excludeFolder url="file://$MODULE_DIR$/olimpiec/vendor/laravel/sanctum" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

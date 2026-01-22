@@ -23,7 +23,7 @@ const Footer = () => {
           </div>
           <div className="footer-section">
             <h4 className="footer-heading">Контакты</h4>
-            <p className="footer-text">Телефон: +7 (800) 123-45-67</p>
+            <p className="footer-text">Телефон: +7 (914) 639-74-08</p>
             <p className="footer-text">Email: info@olimpiec.ru</p>
           </div>
         </div>
