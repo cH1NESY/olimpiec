@@ -61,6 +61,34 @@ const ProductCard = ({ product }) => {
       </div>
       <div className="product-info">
         <h3 className="product-name">{product.name}</h3>
+        {(() => {
+          const rating = parseFloat(product.rating) || 0
+          const reviewsCount = parseInt(product.reviews_count) || 0
+          return rating > 0 && (
+            <div className="product-rating">
+              <div className="product-stars">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className="product-star"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill={star <= Math.round(rating) ? 'currentColor' : 'none'}
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="product-rating-value">{rating.toFixed(1)}</span>
+              {reviewsCount > 0 && (
+                <span className="product-reviews-count">({reviewsCount})</span>
+              )}
+            </div>
+          )
+        })()}
         <div className="product-footer">
           <span className="product-price">{product.price?.toLocaleString('ru-RU')} ₽</span>
           <button 

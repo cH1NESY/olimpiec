@@ -94,6 +94,34 @@
   flex: 1;
 }
 
+.product-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.product-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.product-star {
+  color: var(--accent-yellow);
+  flex-shrink: 0;
+}
+
+.product-rating-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-dark);
+}
+
+.product-reviews-count {
+  font-size: 12px;
+  color: var(--gray);
+}
+
 .product-footer {
   display: flex;
   justify-content: space-between;

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { getProducts, getCategories, searchProducts } from '../api/api'
 import ProductCard from '../components/ProductCard/ProductCard'
 import CategoryFilter from '../components/CategoryFilter/CategoryFilter'
+import FilterPanel from '../components/FilterPanel/FilterPanel'
 import './Catalog.css'
 
 const Catalog = () => {
@@ -17,30 +18,47 @@ const Catalog = () => {
     total: 0
   })
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page')) || 1)
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'name')
-  const [filters, setFilters] = useState({
-    category: searchParams.get('category') || '',
-    search: searchParams.get('search') || ''
-  })
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest')
+  
+  // Parse filters from URL params
+  const parseFiltersFromParams = () => {
+    return {
+      category: searchParams.get('category') || '',
+      search: searchParams.get('search') || '',
+      brands: searchParams.get('brands') ? searchParams.get('brands').split(',') : [],
+      genders: searchParams.get('genders') ? searchParams.get('genders').split(',') : [],
+      sizes: searchParams.get('sizes') ? searchParams.get('sizes').split(',').map(Number) : [],
+      price: {
+        min: searchParams.get('min_price') ? parseFloat(searchParams.get('min_price')) : null,
+        max: searchParams.get('max_price') ? parseFloat(searchParams.get('max_price')) : null
+      },
+      isNew: searchParams.get('is_new') === 'true'
+    }
+  }
 
+  const [filters, setFilters] = useState(parseFiltersFromParams())
+
+  // Update filters when URL params change
+  useEffect(() => {
+    setFilters(parseFiltersFromParams())
+    setCurrentPage(parseInt(searchParams.get('page')) || 1)
+    setSortBy(searchParams.get('sort') || 'newest')
+  }, [searchParams])
+
+  // Load data when filters, sort, or page changes
   useEffect(() => {
     loadData()
-  }, [searchParams.get('category'), searchParams.get('sort'), searchParams.get('page'), searchParams.get('search')])
+  }, [filters.category, filters.search, filters.brands, filters.genders, filters.sizes, filters.price, filters.isNew, sortBy, currentPage])
 
   const loadData = async () => {
     setLoading(true)
     try {
-      const categoryParam = searchParams.get('category') || ''
-      const sortParam = searchParams.get('sort') || 'created_at'
-      const page = parseInt(searchParams.get('page')) || 1
-      
-      const searchParam = searchParams.get('search')
+      const searchParam = filters.search
       
       let productsData
       if (searchParam) {
         // Используем поиск если есть поисковый запрос
         productsData = await searchProducts(searchParam)
-        console.log('Catalog search response:', productsData) // Debug log
         
         // Handle response structure
         let foundProducts = []
@@ -52,7 +70,31 @@ const Catalog = () => {
           }
         }
         
-        console.log('Catalog search results:', foundProducts.length, foundProducts) // Debug log
+        // Apply filters to search results (client-side filtering for search)
+        if (foundProducts.length > 0) {
+          foundProducts = foundProducts.filter(product => {
+            // Brand filter
+            if (filters.brands.length > 0 && product.brand) {
+              if (!filters.brands.includes(product.brand.slug)) return false
+            }
+            // Gender filter
+            if (filters.genders.length > 0) {
+              if (!filters.genders.includes(product.gender)) return false
+            }
+            // Size filter
+            if (filters.sizes.length > 0 && product.sizes) {
+              const productSizeIds = product.sizes.map(s => s.id || s.pivot?.size_id)
+              if (!filters.sizes.some(sizeId => productSizeIds.includes(sizeId))) return false
+            }
+            // Price filter
+            if (filters.price.min !== null && product.price < filters.price.min) return false
+            if (filters.price.max !== null && product.price > filters.price.max) return false
+            // New products filter
+            if (filters.isNew && !product.is_new) return false
+            return true
+          })
+        }
+        
         setProducts(foundProducts)
         setPagination({
           current_page: 1,
@@ -61,16 +103,43 @@ const Catalog = () => {
           total: foundProducts.length
         })
       } else {
-        // Обычный список товаров с пагинацией
+        // Обычный список товаров с фильтрами и пагинацией
         const params = {
-          sort_by: sortParam === 'price' ? 'price' : (sortParam === 'price_asc' || sortParam === 'price_desc' ? 'price' : 'created_at'),
-          sort_order: sortParam === 'price_asc' ? 'asc' : (sortParam === 'price_desc' ? 'desc' : 'desc'),
+          sort: sortBy,
           per_page: 24,
-          page: page
+          page: currentPage
         }
         
-        if (categoryParam) {
-          params.category = categoryParam
+        if (filters.category) {
+          params.category = filters.category
+        }
+        
+        // Brand filters (multiple)
+        if (filters.brands.length > 0) {
+          params.brands = filters.brands.join(',')
+        }
+        
+        // Gender filters (multiple)
+        if (filters.genders.length > 0) {
+          params.genders = filters.genders.join(',')
+        }
+        
+        // Size filter (multiple)
+        if (filters.sizes.length > 0) {
+          params.sizes = filters.sizes.join(',')
+        }
+        
+        // Price filters
+        if (filters.price.min !== null) {
+          params.min_price = filters.price.min
+        }
+        if (filters.price.max !== null) {
+          params.max_price = filters.price.max
+        }
+        
+        // New products filter
+        if (filters.isNew) {
+          params.is_new = 'true'
         }
         
         productsData = await getProducts(params)
@@ -100,7 +169,6 @@ const Catalog = () => {
 
   const handleSortChange = (e) => {
     const newSort = e.target.value
-    setSortBy(newSort)
     setSearchParams(prev => {
       const newParams = new URLSearchParams(prev)
       newParams.set('sort', newSort)
@@ -116,6 +184,67 @@ const Catalog = () => {
       return newParams
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleFilterChange = (newFilters) => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev)
+      
+      // Update all filter params
+      if (newFilters.brands.length > 0) {
+        newParams.set('brands', newFilters.brands.join(','))
+      } else {
+        newParams.delete('brands')
+      }
+      
+      if (newFilters.genders.length > 0) {
+        newParams.set('genders', newFilters.genders.join(','))
+      } else {
+        newParams.delete('genders')
+      }
+      
+      if (newFilters.sizes.length > 0) {
+        newParams.set('sizes', newFilters.sizes.join(','))
+      } else {
+        newParams.delete('sizes')
+      }
+      
+      if (newFilters.price.min !== null && newFilters.price.min !== '') {
+        newParams.set('min_price', newFilters.price.min)
+      } else {
+        newParams.delete('min_price')
+      }
+      
+      if (newFilters.price.max !== null && newFilters.price.max !== '') {
+        newParams.set('max_price', newFilters.price.max)
+      } else {
+        newParams.delete('max_price')
+      }
+      
+      if (newFilters.isNew) {
+        newParams.set('is_new', 'true')
+      } else {
+        newParams.delete('is_new')
+      }
+      
+      newParams.delete('page') // Reset to first page on filter change
+      return newParams
+    })
+  }
+
+  const handleResetFilters = () => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev)
+      // Keep only category and search
+      newParams.delete('brands')
+      newParams.delete('genders')
+      newParams.delete('sizes')
+      newParams.delete('min_price')
+      newParams.delete('max_price')
+      newParams.delete('is_new')
+      newParams.delete('page')
+      return newParams
+    })
   }
 
   return (
@@ -136,7 +265,6 @@ const Catalog = () => {
               categories={categories}
               selectedCategory={filters.category}
               onCategoryChange={(category) => {
-                setFilters(prev => ({ ...prev, category }))
                 setSearchParams(prev => {
                   const newParams = new URLSearchParams(prev)
                   if (category) {
@@ -144,9 +272,15 @@ const Catalog = () => {
                   } else {
                     newParams.delete('category')
                   }
+                  newParams.delete('page')
                   return newParams
                 })
               }}
+            />
+            <FilterPanel
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={handleResetFilters}
             />
           </aside>
 
@@ -163,10 +297,11 @@ const Catalog = () => {
                   value={sortBy}
                   onChange={handleSortChange}
                 >
-                  <option value="name">По названию</option>
+                  <option value="newest">Сначала новые</option>
+                  <option value="popular">По популярности</option>
+                  <option value="rating">По рейтингу</option>
                   <option value="price_asc">По цене: сначала дешевые</option>
                   <option value="price_desc">По цене: сначала дорогие</option>
-                  <option value="newest">Сначала новые</option>
                 </select>
               </div>
             </div>

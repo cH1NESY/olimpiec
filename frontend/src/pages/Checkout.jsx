@@ -41,19 +41,40 @@ const Checkout = () => {
     setLoading(true)
 
     try {
-      await createOrder({
-        ...formData,
+      // Prepare order items
+      const orderItems = cart.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        size_id: item.size_id || null,
+      }))
+
+      // Create order
+      const orderData = {
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
         delivery_method: deliveryMethod,
-        items: cart,
-        total: getTotalPrice()
-      })
-      clearCart()
-      navigate('/checkout/success')
+        items: orderItems,
+        comment: formData.comment || null,
+      }
+
+      if (deliveryMethod === 'delivery') {
+        orderData.delivery_address = formData.address
+      } else {
+        orderData.store_id = 1 // Default store for pickup
+      }
+
+      const response = await createOrder(orderData)
+
+      if (response.success && response.data.id) {
+        // Redirect to payment page
+        navigate(`/payment?order_id=${response.data.id}`)
+      } else {
+        throw new Error(response.message || 'Ошибка при создании заказа')
+      }
     } catch (error) {
       console.error('Error creating order:', error)
-      // For development, just clear cart and navigate
-      clearCart()
-      navigate('/checkout/success')
+      alert(error.response?.data?.message || error.message || 'Ошибка при создании заказа')
     } finally {
       setLoading(false)
     }

@@ -26,16 +26,29 @@ class ProductController extends Controller
             }
         }
 
-        // Filter by brand
+        // Filter by brand (support multiple brands)
         if ($request->has('brand')) {
-            $query->whereHas('brand', function ($q) use ($request) {
-                $q->where('slug', $request->get('brand'));
+            $brandSlug = $request->get('brand');
+            $query->whereHas('brand', function ($q) use ($brandSlug) {
+                $q->where('slug', $brandSlug);
+            });
+        }
+        // Support multiple brands via brands parameter (comma-separated)
+        if ($request->has('brands')) {
+            $brandSlugs = explode(',', $request->get('brands'));
+            $query->whereHas('brand', function ($q) use ($brandSlugs) {
+                $q->whereIn('slug', $brandSlugs);
             });
         }
 
-        // Filter by gender
+        // Filter by gender (support multiple genders)
         if ($request->has('gender')) {
             $query->where('gender', $request->get('gender'));
+        }
+        // Support multiple genders via genders parameter (comma-separated)
+        if ($request->has('genders')) {
+            $genders = explode(',', $request->get('genders'));
+            $query->whereIn('gender', $genders);
         }
 
         // Filter by price range
@@ -51,10 +64,18 @@ class ProductController extends Controller
             $query->where('is_new', true);
         }
 
-        // Filter by size
+        // Filter by size (support multiple sizes)
         if ($request->has('size')) {
-            $query->whereHas('sizes', function ($q) use ($request) {
-                $q->where('sizes.id', $request->get('size'));
+            $sizeId = $request->get('size');
+            $query->whereHas('sizes', function ($q) use ($sizeId) {
+                $q->where('sizes.id', $sizeId);
+            });
+        }
+        // Support multiple sizes via sizes parameter (comma-separated)
+        if ($request->has('sizes')) {
+            $sizeIds = array_map('intval', explode(',', $request->get('sizes')));
+            $query->whereHas('sizes', function ($q) use ($sizeIds) {
+                $q->whereIn('sizes.id', $sizeIds);
             });
         }
 
@@ -62,7 +83,37 @@ class ProductController extends Controller
         $sortBy = $request->get('sort_by', 'created_at');
         $sortOrder = $request->get('sort_order', 'desc');
 
-        $allowedSorts = ['price', 'created_at', 'rating', 'sales_count'];
+        // Handle sort parameter from frontend (price_asc, price_desc, newest, popular, rating)
+        if ($request->has('sort')) {
+            $sortParam = $request->get('sort');
+            switch ($sortParam) {
+                case 'price_asc':
+                    $sortBy = 'price';
+                    $sortOrder = 'asc';
+                    break;
+                case 'price_desc':
+                    $sortBy = 'price';
+                    $sortOrder = 'desc';
+                    break;
+                case 'newest':
+                    $sortBy = 'created_at';
+                    $sortOrder = 'desc';
+                    break;
+                case 'popular':
+                    $sortBy = 'sales_count';
+                    $sortOrder = 'desc';
+                    break;
+                case 'rating':
+                    $sortBy = 'rating';
+                    $sortOrder = 'desc';
+                    break;
+                default:
+                    $sortBy = 'created_at';
+                    $sortOrder = 'desc';
+            }
+        }
+
+        $allowedSorts = ['price', 'created_at', 'rating', 'sales_count', 'name'];
         if (in_array($sortBy, $allowedSorts)) {
             $query->orderBy($sortBy, $sortOrder);
         } else {
@@ -90,7 +141,9 @@ class ProductController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $product = Product::with(['brand', 'category', 'images', 'sizes', 'characteristics'])
+        $product = Product::with(['brand', 'category', 'images', 'sizes', 'characteristics', 'reviews' => function($query) {
+            $query->with('user:id,name')->orderBy('created_at', 'desc')->limit(5);
+        }])
             ->where('is_active', true)
             ->findOrFail($id);
 

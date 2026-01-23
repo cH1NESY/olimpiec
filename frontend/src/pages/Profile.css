@@ -10,7 +10,45 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  margin-bottom: 24px;
+}
+
+.admin-access-banner {
+  background: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-light) 100%);
+  border: 2px solid var(--accent-yellow-dark);
+  border-radius: 12px;
+  padding: 24px;
   margin-bottom: 32px;
+  box-shadow: var(--shadow-yellow);
+}
+
+.admin-access-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.admin-access-content h3 {
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gray-darker);
+}
+
+.admin-access-content p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-dark);
+}
+
+.admin-access-content .btn {
+  margin-left: auto;
 }
 
 .profile-content {

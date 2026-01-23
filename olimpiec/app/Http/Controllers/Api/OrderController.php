@@ -58,12 +58,16 @@ class OrderController extends Controller
             // Create order items
             foreach ($validated['items'] as $item) {
                 $product = \App\Models\Product::findOrFail($item['product_id']);
+                $itemPrice = $product->price;
+                $itemTotal = $itemPrice * $item['quantity'];
+                
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
                     'size_id' => $item['size_id'] ?? null,
                     'quantity' => $item['quantity'],
-                    'price' => $product->price,
+                    'price' => $itemPrice,
+                    'total' => $itemTotal,
                 ]);
             }
 

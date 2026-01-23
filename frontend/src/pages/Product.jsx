@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { getProduct } from '../api/api'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
+import Reviews from '../components/Reviews/Reviews'
 import './Product.css'
 
 const Product = () => {
@@ -168,6 +169,16 @@ const Product = () => {
             </div>
           </div>
         </div>
+
+        <Reviews 
+          productId={product.id}
+          productRating={product.rating || 0}
+          reviewsCount={product.reviews_count || 0}
+          onReviewAdded={(newReview) => {
+            // Reload product data to get updated rating
+            loadProduct()
+          }}
+        />
       </div>
     </div>
   )

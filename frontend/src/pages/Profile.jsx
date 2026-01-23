@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { updateProfile as updateProfileApi } from '../api/api'
 import './Profile.css'
@@ -132,6 +132,20 @@ const Profile = () => {
     <div className="profile-page">
       <div className="container">
         <h1 className="profile-title">Личный кабинет</h1>
+        {user?.is_admin && (
+          <div className="admin-access-banner">
+            <div className="admin-access-content">
+              <span className="admin-icon">👑</span>
+              <div>
+                <h3>Вы администратор</h3>
+                <p>У вас есть доступ к панели управления</p>
+              </div>
+              <Link to="/admin" className="btn btn-primary">
+                Перейти в админ-панель
+              </Link>
+            </div>
+          </div>
+        )}
         <div className="profile-content">
           <div className="profile-main">
             <div className="profile-section">
