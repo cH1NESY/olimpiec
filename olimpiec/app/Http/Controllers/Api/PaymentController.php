@@ -207,7 +207,7 @@ class PaymentController extends Controller
 
         DB::beginTransaction();
         try {
-            $order = Order::findOrFail($orderId);
+            $order = Order::with('items.product')->findOrFail($orderId);
             
             // Find payment by transaction_id or create if not exists
             $payment = Payment::where('transaction_id', $paymentId)->first();
@@ -243,9 +243,12 @@ class PaymentController extends Controller
             }
 
             // Update order status
-            $order->update([
-                'status' => 'paid',
-            ]);
+            if ($order->status !== 'paid') {
+                $order->update([
+                    'status' => 'paid',
+                ]);
+                $this->decrementStock($order);
+            }
 
             DB::commit();
 
@@ -274,7 +277,7 @@ class PaymentController extends Controller
      */
     public function checkStatus(Request $request, int $orderId): JsonResponse
     {
-        $order = Order::with('payment')->findOrFail($orderId);
+        $order = Order::with(['payment', 'items.product'])->findOrFail($orderId);
 
         // If order is not paid yet, try to check payment status from YooKassa
         if ($order->status !== 'paid' && $order->payment && $order->payment->transaction_id) {
@@ -302,6 +305,8 @@ class PaymentController extends Controller
                                 $order->update([
                                     'status' => 'paid',
                                 ]);
+                                
+                                $this->decrementStock($order);
                                 
                                 DB::commit();
                                 
@@ -338,5 +343,36 @@ class PaymentController extends Controller
                 'is_paid' => $order->status === 'paid',
             ]
         ]);
+    }
+
+    /**
+     * Decrement stock for order items
+     */
+    private function decrementStock(Order $order): void
+    {
+        try {
+            foreach ($order->items as $item) {
+                $product = $item->product;
+                
+                if ($item->size_id) {
+                    // Decrement stock for specific size
+                    $sizePivot = $product->sizes()->where('size_id', $item->size_id)->first();
+                    if ($sizePivot && $sizePivot->pivot->stock_quantity > 0) {
+                        $newStock = max(0, $sizePivot->pivot->stock_quantity - $item->quantity);
+                        $product->sizes()->updateExistingPivot($item->size_id, ['stock_quantity' => $newStock]);
+                    }
+                }
+                
+                // Also decrement total stock
+                if ($product->stock_quantity > 0) {
+                    $product->decrement('stock_quantity', $item->quantity);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error decrementing stock', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }

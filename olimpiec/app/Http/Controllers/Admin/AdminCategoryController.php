@@ -18,6 +18,7 @@ class AdminCategoryController extends Controller
         $categories = Category::with('children')
             ->whereNull('parent_id')
             ->orderBy('sort_order')
+            ->orderBy('id', 'asc')
             ->get();
 
         return response()->json([

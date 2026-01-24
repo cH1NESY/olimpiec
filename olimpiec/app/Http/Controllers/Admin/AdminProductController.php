@@ -46,7 +46,7 @@ class AdminProductController extends Controller
         }
 
         $perPage = $request->get('per_page', 20);
-        $products = $query->orderBy('created_at', 'desc')->paginate($perPage);
+        $products = $query->orderBy('id', 'desc')->paginate($perPage);
 
         return response()->json([
             'success' => true,
@@ -79,7 +79,8 @@ class AdminProductController extends Controller
             'sku' => 'nullable|string|unique:products,sku',
             'stock_quantity' => 'integer|min:0',
             'sizes' => 'nullable|array',
-            'sizes.*' => 'exists:sizes,id',
+            'sizes.*.size_id' => 'required|exists:sizes,id',
+            'sizes.*.stock_quantity' => 'nullable|integer|min:0',
             'characteristics' => 'nullable|array',
             'characteristics.*.name' => 'required|string',
             'characteristics.*.value' => 'required|string',
@@ -99,7 +100,11 @@ class AdminProductController extends Controller
 
         // Attach sizes
         if (isset($validated['sizes'])) {
-            $product->sizes()->sync($validated['sizes']);
+            $syncData = [];
+            foreach ($validated['sizes'] as $sizeData) {
+                $syncData[$sizeData['size_id']] = ['stock_quantity' => $sizeData['stock_quantity'] ?? 0];
+            }
+            $product->sizes()->sync($syncData);
         }
 
         // Create characteristics
@@ -155,7 +160,8 @@ class AdminProductController extends Controller
             'sku' => 'nullable|string|unique:products,sku,' . $id,
             'stock_quantity' => 'integer|min:0',
             'sizes' => 'nullable|array',
-            'sizes.*' => 'exists:sizes,id',
+            'sizes.*.size_id' => 'required|exists:sizes,id',
+            'sizes.*.stock_quantity' => 'nullable|integer|min:0',
             'characteristics' => 'nullable|array',
             'characteristics.*.name' => 'required|string',
             'characteristics.*.value' => 'required|string',
@@ -176,7 +182,11 @@ class AdminProductController extends Controller
 
         // Sync sizes
         if (isset($validated['sizes'])) {
-            $product->sizes()->sync($validated['sizes']);
+            $syncData = [];
+            foreach ($validated['sizes'] as $sizeData) {
+                $syncData[$sizeData['size_id']] = ['stock_quantity' => $sizeData['stock_quantity'] ?? 0];
+            }
+            $product->sizes()->sync($syncData);
         }
 
         // Update characteristics

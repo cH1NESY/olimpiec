@@ -15,7 +15,7 @@ class AdminBrandController extends Controller
      */
     public function index(): JsonResponse
     {
-        $brands = Brand::orderBy('name', 'asc')->get();
+        $brands = Brand::orderBy('id', 'desc')->get();
 
         return response()->json([
             'success' => true,

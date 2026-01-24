@@ -46,7 +46,7 @@ class AdminOrderController extends Controller
             }
 
             $perPage = $request->get('per_page', 20);
-            $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
+            $orders = $query->orderBy('id', 'desc')->paginate($perPage);
 
             return response()->json([
                 'success' => true,
