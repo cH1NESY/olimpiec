@@ -253,4 +253,29 @@ export const adminUpdateOrderStatus = async (id, status) => {
   return response.data
 }
 
+// Admin Product Images API
+export const adminUploadProductImages = async (productId, images) => {
+  const formData = new FormData()
+  images.forEach((image) => {
+    formData.append('images[]', image)
+  })
+  
+  const response = await api.post(`/admin/products/${productId}/images`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return response.data
+}
+
+export const adminDeleteProductImage = async (productId, imageId) => {
+  const response = await api.delete(`/admin/products/${productId}/images/${imageId}`)
+  return response.data
+}
+
+export const adminUpdateImageOrder = async (productId, images) => {
+  const response = await api.put(`/admin/products/${productId}/images/order`, { images })
+  return response.data
+}
+
 export default api

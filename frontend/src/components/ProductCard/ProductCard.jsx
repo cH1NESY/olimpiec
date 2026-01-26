@@ -26,9 +26,14 @@ const ProductCard = ({ product }) => {
   const getProductImage = () => {
     if (product.images && product.images.length > 0) {
       const firstImage = product.images[0]
-      return typeof firstImage === 'string' 
-        ? firstImage 
-        : (firstImage.image_path || firstImage.url || firstImage.path)
+      if (typeof firstImage === 'string') {
+        return firstImage.startsWith('http') || firstImage.startsWith('/') 
+          ? firstImage 
+          : `/storage/${firstImage}`
+      }
+      const url = firstImage.image_url || firstImage.image_path || firstImage.url || firstImage.path
+      if (!url) return '/api/placeholder/300/300'
+      return url.startsWith('http') || url.startsWith('/') ? url : `/storage/${url}`
     }
     return product.image || '/api/placeholder/300/300'
   }
@@ -46,7 +51,8 @@ const ProductCard = ({ product }) => {
           alt={product.name}
           className="product-image"
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/300x300?text=No+Image'
+            e.target.onerror = null
+            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23ddd" width="300" height="300"/%3E%3C/svg%3E'
           }}
         />
         <button

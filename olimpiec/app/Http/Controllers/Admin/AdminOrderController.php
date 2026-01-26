@@ -35,13 +35,14 @@ class AdminOrderController extends Controller
             }
 
             // Search by order number or customer name/email
+            // Using parameterized queries to prevent SQL injection
             $search = $request->get('search');
             if ($search && trim($search) !== '') {
-                $searchTerm = trim($search);
+                $searchTerm = '%' . mb_strtolower(trim($search)) . '%';
                 $query->where(function($q) use ($searchTerm) {
-                    $q->where('order_number', 'ilike', "%{$searchTerm}%")
-                      ->orWhereRaw('LOWER(customer_name) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%'])
-                      ->orWhereRaw('LOWER(customer_email) LIKE ?', ['%' . mb_strtolower($searchTerm) . '%']);
+                    $q->whereRaw('LOWER(order_number) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(customer_name) LIKE ?', [$searchTerm])
+                      ->orWhereRaw('LOWER(customer_email) LIKE ?', [$searchTerm]);
                 });
             }
 

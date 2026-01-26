@@ -6,15 +6,16 @@
 }
 
 .login-content {
-  max-width: 450px;
+  max-width: 900px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .login-card {
   background: linear-gradient(135deg, var(--white) 0%, var(--bg-blue-light) 100%);
   border: 2px solid var(--primary-blue-light);
   border-radius: 12px;
-  padding: 40px;
+  padding: 50px 60px;
   box-shadow: var(--shadow-lg);
 }
 
@@ -112,6 +113,10 @@
 @media (max-width: 768px) {
   .login-page {
     padding: 80px 20px 40px;
+  }
+
+  .login-content {
+    max-width: 100%;
   }
 
   .login-card {

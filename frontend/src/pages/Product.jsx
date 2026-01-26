@@ -12,6 +12,7 @@ const Product = () => {
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  const [selectedSize, setSelectedSize] = useState(null)
   const { addToCart } = useCart()
   const { toggleFavorite, isFavorite } = useFavorites()
   const favorite = product ? isFavorite(product.id) : false
@@ -29,6 +30,9 @@ const Product = () => {
       if (productData?.images && productData.images.length > 0) {
         setSelectedImage(0)
       }
+      // If product has sizes but none selected, don't auto-select to force user choice?
+      // Or auto-select first available? Let's force choice for clarity.
+      setSelectedSize(null);
     } catch (error) {
       console.error('Error loading product:', error)
       setProduct(null)
@@ -38,9 +42,34 @@ const Product = () => {
   }
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product)
+    if (product.sizes && product.sizes.length > 0) {
+      if (!selectedSize) {
+        alert('Пожалуйста, выберите размер');
+        return;
+      }
+      // Check stock for selected size
+      const stock = selectedSize.pivot?.stock_quantity || 0;
+      if (stock < quantity) {
+        alert(`Недостаточно товара на складе. Доступно: ${stock} шт.`);
+        return;
+      }
+    } else {
+      // Check total stock for product without sizes
+      // Assuming product.stock_quantity holds total/global stock if no sizes
+      const stock = product.stock_quantity || 0;
+       // If stock management is strictly enforced:
+      if (stock < quantity && stock !== null) { // stock !== null check if unlimited? Assuming 0 default.
+         // If stock is 0, logic should prevent adding.
+         // But existing logic didn't check.
+         // Let's assume strict check if stock_quantity is used.
+         if (stock <= 0) {
+            alert('Товар временно отсутствует на складе');
+            return;
+         }
+      }
     }
+    
+    addToCart(product, quantity, selectedSize)
   }
 
   if (loading) {
@@ -51,15 +80,24 @@ const Product = () => {
     return <div className="loading">Товар не найден</div>
   }
 
-  // Handle images from API - can be array of objects or array of strings
-  const getImageUrl = (img) => {
-    if (typeof img === 'string') return img
-    return img?.image_path || img?.url || img?.path || '/api/placeholder/600/600'
-  }
-  
-  const images = product.images && product.images.length > 0
-    ? product.images.map(getImageUrl)
-    : [product.image || '/api/placeholder/600/600']
+          // Handle images from API - can be array of objects or array of strings
+          const getImageUrl = (img) => {
+            if (typeof img === 'string') {
+              // If it's already a full URL or starts with /, return as is
+              return img.startsWith('http') || img.startsWith('/') ? img : `/storage/${img}`
+            }
+            // Use image_url if available (from accessor), otherwise image_path
+            const url = img?.image_url || img?.image_path || img?.url || img?.path
+            if (!url) return '/api/placeholder/600/600'
+            // If it's already a full URL or starts with /, return as is
+            if (url.startsWith('http') || url.startsWith('/')) return url
+            // Otherwise, assume it's a storage path and add /storage/ prefix
+            return `/storage/${url}`
+          }
+          
+          const images = product.images && product.images.length > 0
+            ? product.images.map(getImageUrl)
+            : [product.image || '/api/placeholder/600/600']
 
   return (
     <div className="product-page">
@@ -70,9 +108,10 @@ const Product = () => {
               <img 
                 src={images[selectedImage] || images[0]} 
                 alt={product.name}
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/600x600?text=No+Image'
-                }}
+                      onError={(e) => {
+                        e.target.onerror = null // Prevent infinite loop
+                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="600"%3E%3Crect fill="%23ddd" width="600" height="600"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ENo Image%3C/text%3E%3C/svg%3E'
+                      }}
               />
             </div>
             {images.length > 1 && (
@@ -87,7 +126,8 @@ const Product = () => {
                       src={img} 
                       alt={`${product.name} ${index + 1}`}
                       onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/100x100?text=No+Image'
+                        e.target.onerror = null
+                        e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3C/svg%3E'
                       }}
                     />
                   </button>
@@ -113,6 +153,39 @@ const Product = () => {
             <div className="product-price-large">
               {product.price?.toLocaleString('ru-RU')} ₽
             </div>
+
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="product-section">
+                <h2 className="section-heading">Размеры</h2>
+                <div className="size-selector">
+                  {product.sizes.map(size => {
+                    const stock = size.pivot?.stock_quantity || 0;
+                    const isOutOfStock = stock <= 0;
+                    return (
+                      <button
+                        key={size.id}
+                        className={`size-btn ${selectedSize?.id === size.id ? 'active' : ''} ${isOutOfStock ? 'disabled' : ''}`}
+                        onClick={() => !isOutOfStock && setSelectedSize(size)}
+                        disabled={isOutOfStock}
+                        title={isOutOfStock ? 'Нет в наличии' : `Осталось: ${stock}`}
+                      >
+                        {size.name}
+                      </button>
+                    )
+                  })}
+                </div>
+                {selectedSize ? (
+                  <div className="stock-info">
+                    {selectedSize.pivot?.stock_quantity < 5 
+                      ? <span className="text-warning">Осталось мало: {selectedSize.pivot.stock_quantity} шт.</span>
+                      : <span className="text-success">В наличии: {selectedSize.pivot.stock_quantity} шт.</span>
+                    }
+                  </div>
+                ) : (
+                  <div className="stock-info hint">Выберите размер, чтобы узнать наличие</div>
+                )}
+              </div>
+            )}
 
             {product.description && (
               <div className="product-section">
@@ -163,8 +236,12 @@ const Product = () => {
                   </button>
                 </div>
               </div>
-              <button className="btn btn-primary btn-add-cart" onClick={handleAddToCart}>
-                Добавить в корзину
+              <button 
+                className="btn btn-primary btn-add-cart" 
+                onClick={handleAddToCart}
+                disabled={product.sizes && product.sizes.length > 0 && !selectedSize}
+              >
+                {product.sizes && product.sizes.length > 0 && !selectedSize ? 'Выберите размер' : 'Добавить в корзину'}
               </button>
             </div>
           </div>

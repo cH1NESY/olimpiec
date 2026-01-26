@@ -71,7 +71,25 @@ const Stores = () => {
               </div>
               <div className="store-actions">
                 <a 
-                  href={`https://yandex.ru/maps/?pt=${store.longitude || store.coordinates?.lng},${store.latitude || store.coordinates?.lat}&z=15`}
+                  href={(() => {
+                    // Если есть ID фирмы 2ГИС, используем его для прямого открытия фирмы
+                    if (store.dgis_firm_id && store.dgis_city) {
+                      const lat = store.latitude || 51.814958;
+                      const lon = store.longitude || 107.595401;
+                      return `https://2gis.ru/${store.dgis_city}/firm/${store.dgis_firm_id}/${lon},${lat}`;
+                    }
+                    
+                    // Если есть координаты, используем их для 2ГИС
+                    const lat = store.latitude || store.coordinates?.lat;
+                    const lon = store.longitude || store.coordinates?.lng;
+                    if (lat && lon) {
+                      return `https://2gis.ru/map/geo/${lon},${lat}`;
+                    }
+                    
+                    // Если координат нет, используем поиск по адресу
+                    const address = encodeURIComponent(store.address || store.name);
+                    return `https://2gis.ru/search/${address}`;
+                  })()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-outline"

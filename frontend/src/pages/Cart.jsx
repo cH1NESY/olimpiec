@@ -28,10 +28,10 @@ const Cart = () => {
         <div className="cart-content">
           <div className="cart-items">
             {cart.map(item => (
-              <div key={item.id} className="cart-item">
+              <div key={item.uniqueId} className="cart-item">
                 <Link to={`/product/${item.id}`} className="cart-item-image">
                   <img 
-                    src={item.image || '/api/placeholder/150/150'} 
+                    src={item.image || (item.images && item.images[0]) || '/api/placeholder/150/150'} 
                     alt={item.name}
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/150x150?text=No+Image'
@@ -42,6 +42,11 @@ const Cart = () => {
                   <Link to={`/product/${item.id}`} className="cart-item-name">
                     {item.name}
                   </Link>
+                  {item.selectedSize && (
+                    <div className="cart-item-size">
+                      Размер: {item.selectedSize.name}
+                    </div>
+                  )}
                   <div className="cart-item-price">
                     {item.price?.toLocaleString('ru-RU')} ₽
                   </div>
@@ -49,14 +54,16 @@ const Cart = () => {
                 <div className="cart-item-quantity">
                   <button 
                     className="quantity-btn"
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.uniqueId, item.quantity - 1)}
                   >
                     −
                   </button>
                   <span className="quantity-value">{item.quantity}</span>
                   <button 
                     className="quantity-btn"
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.uniqueId, item.quantity + 1)}
+                    disabled={item.maxStock !== undefined && item.quantity >= item.maxStock}
+                    style={{ opacity: item.maxStock !== undefined && item.quantity >= item.maxStock ? 0.5 : 1 }}
                   >
                     +
                   </button>
@@ -66,31 +73,30 @@ const Cart = () => {
                 </div>
                 <button 
                   className="cart-item-remove"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.uniqueId)}
                   aria-label="Удалить товар"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                    <path d="M18 6L6 18M6 6l12 12"></path>
                   </svg>
                 </button>
               </div>
             ))}
           </div>
+          
           <div className="cart-summary">
-            <div className="summary-content">
-              <div className="summary-row">
-                <span>Товаров в корзине:</span>
-                <span>{getTotalItems()}</span>
-              </div>
-              <div className="summary-row summary-total">
-                <span>Итого:</span>
-                <span className="total-price">{getTotalPrice().toLocaleString('ru-RU')} ₽</span>
-              </div>
-              <Link to="/checkout" className="btn btn-primary btn-checkout">
-                Оформить заказ
-              </Link>
+            <h2 className="summary-title">Итого</h2>
+            <div className="summary-row">
+              <span>Товары ({getTotalItems()})</span>
+              <span>{getTotalPrice().toLocaleString('ru-RU')} ₽</span>
             </div>
+            <div className="summary-total">
+              <span>К оплате</span>
+              <span>{getTotalPrice().toLocaleString('ru-RU')} ₽</span>
+            </div>
+            <Link to="/checkout" className="btn btn-primary btn-block">
+              Перейти к оформлению
+            </Link>
           </div>
         </div>
       </div>

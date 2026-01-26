@@ -158,7 +158,16 @@ class ProductController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $query = trim($request->get('q', ''));
+        // Validate and sanitize search query
+        $validated = $request->validate([
+            'q' => 'required|string|max:255|min:1',
+        ]);
+        
+        $query = trim($validated['q']);
+        
+        // Additional sanitization to prevent SQL injection
+        $query = mb_substr($query, 0, 255); // Limit length
+        $query = preg_replace('/[^\p{L}\p{N}\s\-_]/u', '', $query); // Remove special characters except letters, numbers, spaces, hyphens, underscores
         
         if (empty($query)) {
             return response()->json([
@@ -171,13 +180,13 @@ class ProductController extends Controller
         }
 
         try {
-            // Use case-insensitive search with LIKE
-            $searchTerm = '%' . $query . '%';
+            // Use parameterized queries to prevent SQL injection
+            // All user input is properly escaped via parameter binding
             $lowerSearchTerm = '%' . mb_strtolower($query, 'UTF-8') . '%';
             
             $products = Product::with(['brand', 'category', 'images'])
                 ->where('is_active', true)
-                ->where(function ($q) use ($lowerSearchTerm, $searchTerm) {
+                ->where(function ($q) use ($lowerSearchTerm) {
                     $q->whereRaw('LOWER(name) LIKE ?', [$lowerSearchTerm])
                       ->orWhereRaw('LOWER(description) LIKE ?', [$lowerSearchTerm])
                       ->orWhereRaw('LOWER(full_description) LIKE ?', [$lowerSearchTerm]);

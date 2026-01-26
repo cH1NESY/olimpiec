@@ -99,9 +99,14 @@ const SearchBar = () => {
   const getProductImage = (product) => {
     if (product.images && product.images.length > 0) {
       const firstImage = product.images[0]
-      return typeof firstImage === 'string' 
-        ? firstImage 
-        : (firstImage.image_path || firstImage.url || firstImage.path)
+      if (typeof firstImage === 'string') {
+        return firstImage.startsWith('http') || firstImage.startsWith('/') 
+          ? firstImage 
+          : `/storage/${firstImage}`
+      }
+      const url = firstImage.image_url || firstImage.image_path || firstImage.url || firstImage.path
+      if (!url) return '/api/placeholder/100/100'
+      return url.startsWith('http') || url.startsWith('/') ? url : `/storage/${url}`
     }
     return product.image || '/api/placeholder/100/100'
   }
@@ -146,7 +151,8 @@ const SearchBar = () => {
                 alt={product.name}
                 className="suggestion-image"
                 onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/60x60?text=No+Image'
+                  e.target.onerror = null
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="60" height="60"%3E%3Crect fill="%23ddd" width="60" height="60"/%3E%3C/svg%3E'
                 }}
               />
               <div className="suggestion-info">

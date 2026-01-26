@@ -6,7 +6,10 @@ import {
   adminUpdateProduct,
   adminGetCategories,
   adminGetBrands,
-  getSizes
+  getSizes,
+  adminUploadProductImages,
+  adminDeleteProductImage,
+  adminUpdateImageOrder
 } from '../../api/api'
 import './AdminProductForm.css'
 
@@ -19,7 +22,7 @@ const AdminProductForm = () => {
   const [loadingData, setLoadingData] = useState(true)
   const [categories, setCategories] = useState([])
   const [brands, setBrands] = useState([])
-  const [sizes, setSizes] = useState([])
+  const [availableSizes, setAvailableSizes] = useState([])
   
   const [formData, setFormData] = useState({
     name: '',
@@ -34,11 +37,13 @@ const AdminProductForm = () => {
     is_active: true,
     sku: '',
     stock_quantity: 0,
-    sizes: [],
+    sizes: [], // Array of { size_id, stock_quantity }
     characteristics: []
   })
 
   const [errors, setErrors] = useState({})
+  const [productImages, setProductImages] = useState([])
+  const [uploadingImages, setUploadingImages] = useState(false)
 
   useEffect(() => {
     loadFormData()
@@ -56,7 +61,7 @@ const AdminProductForm = () => {
       
       setCategories(categoriesRes.data || [])
       setBrands(brandsRes.data || [])
-      setSizes(sizesRes.data || [])
+      setAvailableSizes(sizesRes.data || [])
 
       // If editing, load product data
       if (isEdit) {
@@ -76,12 +81,26 @@ const AdminProductForm = () => {
           is_active: product.is_active !== undefined ? product.is_active : true,
           sku: product.sku || '',
           stock_quantity: product.stock_quantity || 0,
-          sizes: product.sizes ? product.sizes.map(s => s.id || s) : [],
+          sizes: product.sizes ? product.sizes.map(s => ({
+            size_id: s.id,
+            stock_quantity: s.pivot?.stock_quantity || 0
+          })) : [],
           characteristics: product.characteristics ? product.characteristics.map(c => ({
             name: c.name || '',
             value: c.value || ''
           })) : []
         })
+        
+        // Load product images
+        if (product.images && product.images.length > 0) {
+          setProductImages(product.images.map(img => ({
+            id: img.id,
+            image_path: img.image_url || img.image_path || '',
+            image_url: img.image_url || img.image_path || '',
+            sort_order: img.sort_order || 0,
+            is_main: img.is_main || false
+          })))
+        }
       }
     } catch (error) {
       console.error('Error loading form data:', error)
@@ -107,12 +126,29 @@ const AdminProductForm = () => {
     }
   }
 
-  const handleSizeChange = (sizeId) => {
+  const handleSizeToggle = (sizeId) => {
+    setFormData(prev => {
+      const exists = prev.sizes.find(s => s.size_id === sizeId)
+      if (exists) {
+        return {
+          ...prev,
+          sizes: prev.sizes.filter(s => s.size_id !== sizeId)
+        }
+      } else {
+        return {
+          ...prev,
+          sizes: [...prev.sizes, { size_id: sizeId, stock_quantity: 0 }]
+        }
+      }
+    })
+  }
+
+  const handleSizeStockChange = (sizeId, quantity) => {
     setFormData(prev => ({
       ...prev,
-      sizes: prev.sizes.includes(sizeId)
-        ? prev.sizes.filter(id => id !== sizeId)
-        : [...prev.sizes, sizeId]
+      sizes: prev.sizes.map(s => 
+        s.size_id === sizeId ? { ...s, stock_quantity: parseInt(quantity) || 0 } : s
+      )
     }))
   }
 
@@ -139,21 +175,107 @@ const AdminProductForm = () => {
     }))
   }
 
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files)
+    if (files.length === 0) return
+
+    if (!isEdit || !id) {
+      alert('Сначала создайте товар, затем загрузите изображения')
+      return
+    }
+
+    setUploadingImages(true)
+    try {
+      const response = await adminUploadProductImages(id, files)
+      if (response.success && response.data) {
+        // Add new images to the list using image_url from response
+        const newImages = response.data.map(img => {
+          // Use image_url if available, otherwise construct from image_path
+          const imageUrl = img.image_url || (img.image_path ? 
+            (img.image_path.startsWith('http') || img.image_path.startsWith('/') 
+              ? img.image_path 
+              : `/storage/${img.image_path}`) 
+            : '')
+          
+          return {
+            id: img.id,
+            image_path: imageUrl,
+            image_url: imageUrl,
+            sort_order: img.sort_order || 0,
+            is_main: img.is_main || false
+          }
+        })
+        setProductImages(prev => [...prev, ...newImages].sort((a, b) => a.sort_order - b.sort_order))
+        alert('Изображения успешно загружены')
+      }
+    } catch (error) {
+      console.error('Error uploading images:', error)
+      alert(error.response?.data?.message || 'Ошибка при загрузке изображений')
+    } finally {
+      setUploadingImages(false)
+      e.target.value = '' // Reset file input
+    }
+  }
+
+  const handleDeleteImage = async (imageId) => {
+    if (!window.confirm('Удалить это изображение?')) return
+
+    if (!isEdit || !id) return
+
+    try {
+      const response = await adminDeleteProductImage(id, imageId)
+      if (response.success) {
+        setProductImages(prev => prev.filter(img => img.id !== imageId))
+        alert('Изображение удалено')
+      }
+    } catch (error) {
+      console.error('Error deleting image:', error)
+      alert(error.response?.data?.message || 'Ошибка при удалении изображения')
+    }
+  }
+
+  const handleSetMainImage = async (imageId) => {
+    if (!isEdit || !id) return
+
+    const updatedImages = productImages.map(img => ({
+      ...img,
+      is_main: img.id === imageId
+    }))
+
+    try {
+      await adminUpdateImageOrder(id, updatedImages.map(img => ({
+        id: img.id,
+        sort_order: img.sort_order,
+        is_main: img.is_main
+      })))
+      setProductImages(updatedImages)
+    } catch (error) {
+      console.error('Error updating image order:', error)
+      alert('Ошибка при обновлении главного изображения')
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrors({})
     setLoading(true)
 
     try {
+      // Calculate total stock from sizes if any sizes are selected
+      let totalStock = parseInt(formData.stock_quantity) || 0;
+      if (formData.sizes.length > 0) {
+        totalStock = formData.sizes.reduce((sum, s) => sum + (parseInt(s.stock_quantity) || 0), 0);
+      }
+
       // Prepare data
       const submitData = {
         ...formData,
         price: parseFloat(formData.price) || 0,
         old_price: formData.old_price ? parseFloat(formData.old_price) : null,
-        stock_quantity: parseInt(formData.stock_quantity) || 0,
+        stock_quantity: totalStock,
         category_id: formData.category_id ? parseInt(formData.category_id) : null,
         brand_id: formData.brand_id ? parseInt(formData.brand_id) : null,
-        sizes: formData.sizes.map(id => parseInt(id)),
+        // sizes is already in the correct format: [{ size_id, stock_quantity }]
         characteristics: formData.characteristics.filter(c => c.name && c.value)
       }
 
@@ -161,8 +283,11 @@ const AdminProductForm = () => {
         await adminUpdateProduct(id, submitData)
         alert('Товар успешно обновлен')
       } else {
-        await adminCreateProduct(submitData)
+        const response = await adminCreateProduct(submitData)
         alert('Товар успешно создан')
+        // Redirect to edit page to allow image upload
+        navigate(`/admin/products/${response.data.id}/edit`)
+        return
       }
       
       navigate('/admin/products')
@@ -321,33 +446,129 @@ const AdminProductForm = () => {
               {errors.sku && <span className="error-text">{errors.sku[0]}</span>}
             </div>
           </div>
-
+          
           <div className="form-group">
-            <label>Количество на складе</label>
-            <input
-              type="number"
-              name="stock_quantity"
-              value={formData.stock_quantity}
-              onChange={handleChange}
-              min="0"
-            />
+             <label>Общее количество (если нет размеров)</label>
+             <input
+               type="number"
+               name="stock_quantity"
+               value={formData.stock_quantity}
+               onChange={handleChange}
+               min="0"
+               disabled={formData.sizes.length > 0}
+             />
+             {formData.sizes.length > 0 && <small style={{color: '#666'}}>Рассчитывается автоматически как сумма остатков по размерам</small>}
+           </div>
+
+        </div>
+
+        <div className="form-section">
+          <h3>Размеры и остатки</h3>
+          <div className="sizes-grid">
+            {availableSizes.map(size => {
+              const selectedSize = formData.sizes.find(s => s.size_id === size.id)
+              const isSelected = !!selectedSize
+
+              return (
+                <div key={size.id} className={`size-item ${isSelected ? 'selected' : ''}`}>
+                  <label className="size-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => handleSizeToggle(size.id)}
+                    />
+                    <span className="size-name">{size.name}</span>
+                  </label>
+                  
+                  {isSelected && (
+                    <div className="size-stock">
+                      <label>Кол-во:</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={selectedSize.stock_quantity}
+                        onChange={(e) => handleSizeStockChange(size.id, e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 
         <div className="form-section">
-          <h3>Размеры</h3>
-          <div className="sizes-grid">
-            {sizes.map(size => (
-              <label key={size.id} className="size-checkbox">
+          <h3>Изображения товара</h3>
+          {isEdit && (
+            <>
+              <div className="images-upload-area">
                 <input
-                  type="checkbox"
-                  checked={formData.sizes.includes(size.id)}
-                  onChange={() => handleSizeChange(size.id)}
+                  type="file"
+                  id="image-upload"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImages}
+                  style={{ display: 'none' }}
                 />
-                <span>{size.name}</span>
-              </label>
-            ))}
-          </div>
+                <label htmlFor="image-upload" className="btn btn-secondary">
+                  {uploadingImages ? 'Загрузка...' : '+ Загрузить изображения'}
+                </label>
+                <small style={{ display: 'block', marginTop: '8px', color: '#666' }}>
+                  Можно загрузить несколько изображений. Первое изображение будет главным.
+                </small>
+              </div>
+
+              {productImages.length > 0 && (
+                <div className="images-grid">
+                  {productImages.map((img, index) => {
+                    const imageUrl = img.image_url || img.image_path || ''
+                    return (
+                      <div key={img.id} className={`image-item ${img.is_main ? 'main' : ''}`}>
+                        <img 
+                          src={imageUrl} 
+                          alt={`Изображение ${index + 1}`}
+                          onError={(e) => {
+                            console.error('Image load error:', imageUrl)
+                            e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'
+                          }}
+                        />
+                      <div className="image-actions">
+                        {!img.is_main && (
+                          <button
+                            type="button"
+                            className="btn-image-action"
+                            onClick={() => handleSetMainImage(img.id)}
+                            title="Сделать главным"
+                          >
+                            ⭐
+                          </button>
+                        )}
+                        {img.is_main && (
+                          <span className="main-badge">Главное</span>
+                        )}
+                        <button
+                          type="button"
+                          className="btn-image-action btn-delete"
+                          onClick={() => handleDeleteImage(img.id)}
+                          title="Удалить"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                    )
+                  })}
+                </div>
+              )}
+            </>
+          )}
+          {!isEdit && (
+            <p style={{ color: '#666', fontStyle: 'italic' }}>
+              После создания товара вы сможете загрузить изображения
+            </p>
+          )}
         </div>
 
         <div className="form-section">

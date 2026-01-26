@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Category;
 use App\Models\Brand;
 use App\Models\Size;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class AdminProductController extends Controller
 {
@@ -220,5 +222,170 @@ class AdminProductController extends Controller
             'success' => true,
             'message' => 'Товар успешно удален'
         ]);
+    }
+
+    /**
+     * Upload images for a product
+     */
+    public function uploadImages(Request $request, string $id): JsonResponse
+    {
+        $product = Product::findOrFail($id);
+
+        $request->validate([
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+        ]);
+
+        $uploadedImages = [];
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->file('images') as $index => $file) {
+                // Generate unique filename
+                $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+                
+                // Store file in public storage
+                $path = $file->storeAs('products', $filename, 'public');
+                
+                // Get the highest sort_order for this product
+                $maxSortOrder = ProductImage::where('product_id', $product->id)->max('sort_order') ?? -1;
+                
+                // Check if this is the first image (should be main)
+                $isMain = ProductImage::where('product_id', $product->id)->count() === 0;
+                
+                // Create image record
+                $image = ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $path,
+                    'sort_order' => $maxSortOrder + 1 + $index,
+                    'is_main' => $isMain && $index === 0,
+                ]);
+
+                // Reload image to get accessor
+                $image->refresh();
+                
+                $uploadedImages[] = [
+                    'id' => $image->id,
+                    'image_path' => $image->image_path,
+                    'image_url' => $image->image_url,
+                    'sort_order' => $image->sort_order,
+                    'is_main' => $image->is_main,
+                ];
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Изображения успешно загружены',
+                'data' => $uploadedImages
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Clean up uploaded files on error
+            foreach ($uploadedImages as $img) {
+                if (isset($img['image_path'])) {
+                    Storage::disk('public')->delete(str_replace('/storage/', '', $img['image_path']));
+                }
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при загрузке изображений: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete an image
+     */
+    public function deleteImage(string $productId, string $imageId): JsonResponse
+    {
+        $product = Product::findOrFail($productId);
+        $image = ProductImage::where('product_id', $product->id)
+            ->findOrFail($imageId);
+
+        try {
+            // Delete file from storage
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            // If this was the main image, set another one as main
+            if ($image->is_main) {
+                $nextImage = ProductImage::where('product_id', $product->id)
+                    ->where('id', '!=', $image->id)
+                    ->orderBy('sort_order')
+                    ->first();
+                
+                if ($nextImage) {
+                    $nextImage->update(['is_main' => true]);
+                }
+            }
+
+            // Delete image record
+            $image->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Изображение успешно удалено'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при удалении изображения: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update image order and main status
+     */
+    public function updateImageOrder(Request $request, string $productId): JsonResponse
+    {
+        $product = Product::findOrFail($productId);
+
+        $request->validate([
+            'images' => 'required|array',
+            'images.*.id' => 'required|exists:product_images,id',
+            'images.*.sort_order' => 'required|integer',
+            'images.*.is_main' => 'boolean',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->input('images') as $imageData) {
+                $image = ProductImage::where('product_id', $product->id)
+                    ->findOrFail($imageData['id']);
+
+                $updateData = [
+                    'sort_order' => $imageData['sort_order'],
+                ];
+
+                // If this image is marked as main, unset others
+                if (isset($imageData['is_main']) && $imageData['is_main']) {
+                    ProductImage::where('product_id', $product->id)
+                        ->where('id', '!=', $image->id)
+                        ->update(['is_main' => false]);
+                    $updateData['is_main'] = true;
+                }
+
+                $image->update($updateData);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Порядок изображений обновлен'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка при обновлении порядка: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

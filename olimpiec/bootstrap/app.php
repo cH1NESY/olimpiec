@@ -14,11 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->api(prepend: [
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            \App\Http\Middleware\SecurityHeadersMiddleware::class,
         ]);
         
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
+        
+        // Rate limiting for API routes
+        $middleware->throttleApi('60,1'); // 60 requests per minute
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

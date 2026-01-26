@@ -45,7 +45,7 @@ const Checkout = () => {
       const orderItems = cart.map(item => ({
         product_id: item.id,
         quantity: item.quantity,
-        size_id: item.size_id || null,
+        size_id: item.selectedSize ? item.selectedSize.id : null,
       }))
 
       // Create order
@@ -200,8 +200,14 @@ const Checkout = () => {
             <h2 className="summary-title">Ваш заказ</h2>
             <div className="summary-items">
               {cart.map(item => (
-                <div key={item.id} className="summary-item">
-                  <span className="summary-item-name">{item.name} × {item.quantity}</span>
+                <div key={item.uniqueId} className="summary-item">
+                  <div className="summary-item-info">
+                    <span className="summary-item-name">{item.name}</span>
+                    {item.selectedSize && (
+                      <span className="summary-item-size">Размер: {item.selectedSize.name}</span>
+                    )}
+                    <span className="summary-item-qty">x {item.quantity}</span>
+                  </div>
                   <span className="summary-item-price">
                     {(item.price * item.quantity).toLocaleString('ru-RU')} ₽
                   </span>

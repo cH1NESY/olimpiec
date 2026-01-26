@@ -34,11 +34,45 @@ class OrderController extends Controller
         try {
             $user = $request->user();
             
-            // Calculate total
+            // Calculate total and validate stock availability
             $total = 0;
+            $itemsToCreate = [];
+            
             foreach ($validated['items'] as $item) {
-                $product = \App\Models\Product::findOrFail($item['product_id']);
-                $total += $product->price * $item['quantity'];
+                // Lock product row to prevent race conditions
+                $product = \App\Models\Product::lockForUpdate()->findOrFail($item['product_id']);
+                
+                // Validate stock availability
+                if ($item['size_id']) {
+                    $sizePivot = $product->sizes()->where('sizes.id', $item['size_id'])->first();
+                    if (!$sizePivot || $sizePivot->pivot->stock_quantity < $item['quantity']) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Недостаточно товара '{$product->name}' размера {$sizePivot->name ?? 'N/A'} в наличии"
+                        ], 400);
+                    }
+                } else {
+                    if ($product->stock_quantity < $item['quantity']) {
+                        DB::rollBack();
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Недостаточно товара '{$product->name}' в наличии"
+                        ], 400);
+                    }
+                }
+                
+                $itemPrice = $product->price;
+                $itemTotal = $itemPrice * $item['quantity'];
+                $total += $itemTotal;
+                
+                $itemsToCreate[] = [
+                    'product_id' => $item['product_id'],
+                    'size_id' => $item['size_id'] ?? null,
+                    'quantity' => $item['quantity'],
+                    'price' => $itemPrice,
+                    'total' => $itemTotal,
+                ];
             }
 
             // Create order
@@ -56,18 +90,14 @@ class OrderController extends Controller
             ]);
 
             // Create order items
-            foreach ($validated['items'] as $item) {
-                $product = \App\Models\Product::findOrFail($item['product_id']);
-                $itemPrice = $product->price;
-                $itemTotal = $itemPrice * $item['quantity'];
-                
+            foreach ($itemsToCreate as $itemData) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item['product_id'],
-                    'size_id' => $item['size_id'] ?? null,
-                    'quantity' => $item['quantity'],
-                    'price' => $itemPrice,
-                    'total' => $itemTotal,
+                    'product_id' => $itemData['product_id'],
+                    'size_id' => $itemData['size_id'],
+                    'quantity' => $itemData['quantity'],
+                    'price' => $itemData['price'],
+                    'total' => $itemData['total'],
                 ]);
             }
 

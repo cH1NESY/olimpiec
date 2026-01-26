@@ -189,15 +189,25 @@ const AdminProducts = () => {
                   <tr key={product.id}>
                     <td>{product.id}</td>
                     <td>
-                      {product.images && product.images.length > 0 ? (
-                        <img 
-                          src={typeof product.images[0] === 'string' 
-                            ? product.images[0] 
-                            : product.images[0].image_path} 
-                          alt={product.name}
-                          className="product-thumb"
-                        />
-                      ) : (
+                      {product.images && product.images.length > 0 ? (() => {
+                        const firstImage = product.images[0]
+                        const imageUrl = typeof firstImage === 'string' 
+                          ? (firstImage.startsWith('http') || firstImage.startsWith('/') ? firstImage : `/storage/${firstImage}`)
+                          : (firstImage.image_url || firstImage.image_path || '')
+                        const finalUrl = imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/') 
+                          ? `/storage/${imageUrl}` 
+                          : imageUrl
+                        return (
+                          <img 
+                            src={finalUrl || '/api/placeholder/150/150'} 
+                            alt={product.name}
+                            className="product-thumb"
+                            onError={(e) => {
+                              e.target.src = 'https://via.placeholder.com/150x150?text=No+Image'
+                            }}
+                          />
+                        )
+                      })() : (
                         <div className="product-thumb-placeholder">Нет фото</div>
                       )}
                     </td>

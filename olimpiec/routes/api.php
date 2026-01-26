@@ -28,33 +28,36 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 // Reviews routes
 Route::get('/products/{productId}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'index']);
 Route::get('/products/{productId}/can-review', [\App\Http\Controllers\Api\ReviewController::class, 'canReview'])->middleware('auth:sanctum');
-Route::post('/products/{productId}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/products/{productId}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store'])->middleware(['auth:sanctum', 'throttle:5,1']); // 5 reviews per minute
 
 Route::get('/stores', [StoreController::class, 'index']);
 
-// Auth routes
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
+// Auth routes with stricter rate limiting
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1'); // 5 requests per minute
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // 5 requests per minute
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/user', [AuthController::class, 'user']);
     Route::put('/auth/user', [AuthController::class, 'update']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
-    Route::post('/orders', [\App\Http\Controllers\Api\OrderController::class, 'store']);
+    Route::post('/orders', [\App\Http\Controllers\Api\OrderController::class, 'store'])->middleware('throttle:10,1'); // 10 orders per minute
 });
 
 // Payment routes (public for webhook, protected for creating payment)
-Route::post('/payments/webhook', [\App\Http\Controllers\Api\PaymentController::class, 'webhook']);
+Route::post('/payments/webhook', [\App\Http\Controllers\Api\PaymentController::class, 'webhook'])->middleware('throttle:100,1'); // Higher limit for webhooks
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/payments/create', [\App\Http\Controllers\Api\PaymentController::class, 'createPayment']);
-    Route::get('/payments/status/{orderId}', [\App\Http\Controllers\Api\PaymentController::class, 'checkStatus']);
+    Route::post('/payments/create', [\App\Http\Controllers\Api\PaymentController::class, 'createPayment'])->middleware('throttle:10,1'); // 10 requests per minute
+    Route::get('/payments/status/{orderId}', [\App\Http\Controllers\Api\PaymentController::class, 'checkStatus'])->middleware('throttle:30,1'); // 30 requests per minute
 });
 
 // Admin routes
 Route::middleware(['auth:sanctum', \App\Http\Middleware\AdminMiddleware::class])->prefix('admin')->group(function () {
     // Products
     Route::apiResource('products', \App\Http\Controllers\Admin\AdminProductController::class);
+    Route::post('products/{id}/images', [\App\Http\Controllers\Admin\AdminProductController::class, 'uploadImages']);
+    Route::delete('products/{productId}/images/{imageId}', [\App\Http\Controllers\Admin\AdminProductController::class, 'deleteImage']);
+    Route::put('products/{id}/images/order', [\App\Http\Controllers\Admin\AdminProductController::class, 'updateImageOrder']);
     
     // Categories
     Route::apiResource('categories', \App\Http\Controllers\Admin\AdminCategoryController::class);

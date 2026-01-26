@@ -347,32 +347,72 @@ class PaymentController extends Controller
 
     /**
      * Decrement stock for order items
+     * Uses database-level locking to prevent race conditions
      */
     private function decrementStock(Order $order): void
     {
         try {
+            // Reload order with fresh items to ensure we have latest data
+            $order->load('items.product.sizes');
+            
             foreach ($order->items as $item) {
                 $product = $item->product;
                 
-                if ($item->size_id) {
-                    // Decrement stock for specific size
-                    $sizePivot = $product->sizes()->where('size_id', $item->size_id)->first();
-                    if ($sizePivot && $sizePivot->pivot->stock_quantity > 0) {
-                        $newStock = max(0, $sizePivot->pivot->stock_quantity - $item->quantity);
-                        $product->sizes()->updateExistingPivot($item->size_id, ['stock_quantity' => $newStock]);
-                    }
+                if (!$product) {
+                    Log::warning('Product not found for order item', [
+                        'order_id' => $order->id,
+                        'item_id' => $item->id,
+                        'product_id' => $item->product_id
+                    ]);
+                    continue;
                 }
                 
-                // Also decrement total stock
-                if ($product->stock_quantity > 0) {
-                    $product->decrement('stock_quantity', $item->quantity);
-                }
+                // Use database transaction with row locking to prevent race conditions
+                DB::transaction(function () use ($product, $item) {
+                    // Lock the product row for update
+                    $lockedProduct = \App\Models\Product::lockForUpdate()->find($product->id);
+                    
+                    if (!$lockedProduct) {
+                        throw new \Exception("Product {$product->id} not found during stock decrement");
+                    }
+                    
+                    if ($item->size_id) {
+                        // Decrement stock for specific size using safe update
+                        $sizePivot = $lockedProduct->sizes()->where('sizes.id', $item->size_id)->first();
+                        if ($sizePivot && $sizePivot->pivot->stock_quantity >= $item->quantity) {
+                            $newStock = $sizePivot->pivot->stock_quantity - $item->quantity;
+                            $lockedProduct->sizes()->updateExistingPivot($item->size_id, [
+                                'stock_quantity' => max(0, $newStock)
+                            ]);
+                        } else {
+                            Log::warning('Insufficient stock for size', [
+                                'product_id' => $product->id,
+                                'size_id' => $item->size_id,
+                                'requested' => $item->quantity,
+                                'available' => $sizePivot ? $sizePivot->pivot->stock_quantity : 0
+                            ]);
+                        }
+                    }
+                    
+                    // Decrement total stock with validation
+                    if ($lockedProduct->stock_quantity >= $item->quantity) {
+                        $lockedProduct->decrement('stock_quantity', $item->quantity);
+                    } else {
+                        Log::warning('Insufficient total stock', [
+                            'product_id' => $product->id,
+                            'requested' => $item->quantity,
+                            'available' => $lockedProduct->stock_quantity
+                        ]);
+                    }
+                });
             }
         } catch (\Exception $e) {
             Log::error('Error decrementing stock', [
                 'order_id' => $order->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
+            throw $e; // Re-throw to trigger transaction rollback
         }
     }
 }

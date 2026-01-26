@@ -17,6 +17,8 @@ class Store extends Model
         'working_hours',
         'latitude',
         'longitude',
+        'dgis_firm_id',
+        'dgis_city',
         'is_active',
     ];
 

@@ -18,8 +18,10 @@ class StoreSeeder extends Seeder
             'phone' => '89146397408, 89835397989',
             'email' => 'info@olimpiec.ru',
             'working_hours' => 'Пн-Вс: 10:00 - 22:00',
-            'latitude' => 51.8272,
-            'longitude' => 107.6063,
+            'latitude' => 51.814958,
+            'longitude' => 107.595401,
+            'dgis_firm_id' => '70000001055140011',
+            'dgis_city' => 'ulanude',
         ]);
     }
 }

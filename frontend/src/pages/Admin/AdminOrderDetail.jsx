@@ -183,9 +183,15 @@ const AdminOrderDetail = () => {
                       <div className="order-item-product">
                         {item.product?.images?.[0] && (
                           <img 
-                            src={typeof item.product.images[0] === 'string' 
-                              ? item.product.images[0] 
-                              : item.product.images[0].image_path} 
+                            src={(() => {
+                              const firstImage = item.product.images[0]
+                              const imageUrl = typeof firstImage === 'string' 
+                                ? (firstImage.startsWith('http') || firstImage.startsWith('/') ? firstImage : `/storage/${firstImage}`)
+                                : (firstImage?.image_url || firstImage?.image_path || '')
+                              return imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/') 
+                                ? `/storage/${imageUrl}` 
+                                : imageUrl
+                            })()} 
                             alt={item.product.name}
                             className="order-item-image"
                           />
