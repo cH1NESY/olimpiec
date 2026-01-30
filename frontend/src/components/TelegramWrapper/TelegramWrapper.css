@@ -1,0 +1,30 @@
+.telegram-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
+}
+
+.telegram-wrapper.telegram-active {
+  /* Telegram-specific styles */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Hide header/footer in Telegram if needed */
+.telegram-wrapper.telegram-active .header {
+  /* Adjust header for Telegram */
+}
+
+.telegram-wrapper.telegram-active .footer {
+  /* Adjust footer for Telegram */
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+
+/* Mobile optimizations for Telegram */
+@media (max-width: 768px) {
+  .telegram-wrapper.telegram-active {
+    /* Additional mobile optimizations */
+  }
+}

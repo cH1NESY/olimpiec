@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { getUser, getStoredUser, logout as apiLogout } from '../api/api'
+import { getUser, getStoredUser, logout as apiLogout, telegramAuth } from '../api/api'
+import { isTelegramWebApp, initTelegramWebApp, getTelegramInitData } from '../utils/telegram'
 
 const AuthContext = createContext()
 
@@ -15,20 +16,54 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    // Try to get user from localStorage first
-    const storedUser = getStoredUser()
-    const token = localStorage.getItem('auth_token')
-    
-    if (storedUser && token) {
-      setUser(storedUser)
-      setLoading(false)
-      // Then try to fetch from API to verify token
-      loadUser()
-    } else {
+  const handleTelegramAuth = async (initData) => {
+    setLoading(true)
+    try {
+      const response = await telegramAuth(initData)
+      if (response.success && response.data.user) {
+        setUser(response.data.user)
+      } else {
+        setUser(null)
+      }
+    } catch (error) {
+      console.error('Telegram auth error:', error)
       setUser(null)
+    } finally {
       setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    const initializeAuth = async () => {
+      // Initialize Telegram Web App if running in Telegram
+      if (isTelegramWebApp()) {
+        initTelegramWebApp()
+        
+        // Try Telegram authentication
+        const initData = getTelegramInitData()
+        if (initData) {
+          await handleTelegramAuth(initData)
+          return
+        }
+      }
+
+      // Try to get user from localStorage first
+      const storedUser = getStoredUser()
+      const token = localStorage.getItem('auth_token')
+      
+      if (storedUser && token) {
+        setUser(storedUser)
+        setLoading(false)
+        // Then try to fetch from API to verify token
+        await loadUser()
+      } else {
+        setUser(null)
+        setLoading(false)
+      }
+    }
+
+    initializeAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const loadUser = async () => {

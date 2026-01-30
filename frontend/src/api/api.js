@@ -145,6 +145,18 @@ export const getStoredUser = () => {
   return userStr ? JSON.parse(userStr) : null
 }
 
+// Telegram auth
+export const telegramAuth = async (initData) => {
+  const response = await api.post('/auth/telegram', {
+    init_data: initData
+  })
+  if (response.data.success && response.data.data.token) {
+    localStorage.setItem('auth_token', response.data.data.token)
+    localStorage.setItem('user', JSON.stringify(response.data.data.user))
+  }
+  return response.data
+}
+
 // Stores API
 export const getStores = async () => {
   const response = await api.get('/stores')

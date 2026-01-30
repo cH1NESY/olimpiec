@@ -25,12 +25,14 @@ import AdminOrderDetail from './pages/Admin/AdminOrderDetail'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext'
 import { FavoritesProvider } from './context/FavoritesContext'
+import TelegramWrapper from './components/TelegramWrapper/TelegramWrapper'
 
 function App() {
   return (
     <AuthProvider>
       <FavoritesProvider>
         <CartProvider>
+        <TelegramWrapper>
         <Router>
           <Routes>
             {/* Admin routes */}
@@ -74,6 +76,7 @@ function App() {
             } />
           </Routes>
         </Router>
+        </TelegramWrapper>
         </CartProvider>
       </FavoritesProvider>
     </AuthProvider>

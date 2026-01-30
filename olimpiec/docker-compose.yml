@@ -83,7 +83,7 @@ services:
     container_name: frontend-olimpiec
     restart: unless-stopped
     ports:
-      - "127.0.0.1:5173:80"  # Frontend на порту 5173
+      - "5173:80"  # Frontend на порту 5173 (доступен на всех интерфейсах для cloudflared)
     volumes:
       - ../frontend/dist:/usr/share/nginx/html:ro
     networks:

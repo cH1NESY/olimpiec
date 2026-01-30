@@ -18,7 +18,11 @@ return [
         'http://127.0.0.1:5173',
     ]),
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://.*\.trycloudflare\.com$#',  // Cloudflared tunnels
+        '#^https://.*\.ngrok\.io$#',            // Ngrok tunnels
+        '#^https://.*\.ngrok-free\.app$#',      // Ngrok free tunnels
+    ],
 
     'allowed_headers' => [
         'Accept',

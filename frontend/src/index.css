@@ -32,6 +32,17 @@
   --bg-red-light: #fee2e2;
   --bg-blue-light: #dbeafe;
   
+  /* Telegram theme colors (will be overridden by Telegram Web App) */
+  --tg-theme-bg-color: var(--white);
+  --tg-theme-text-color: var(--gray-dark);
+  --tg-theme-hint-color: var(--gray);
+  --tg-theme-link-color: var(--primary-blue);
+  --tg-theme-button-color: var(--primary-blue);
+  --tg-theme-button-text-color: var(--white);
+  
+  /* Viewport height for mobile (Telegram) */
+  --vh: 1vh;
+  
   /* Градиенты */
   --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
   --gradient-accent-yellow: linear-gradient(135deg, var(--accent-yellow) 0%, var(--accent-yellow-light) 100%);
@@ -53,9 +64,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--gray-dark);
-  background-color: var(--white);
+  color: var(--tg-theme-text-color, var(--gray-dark));
+  background-color: var(--tg-theme-bg-color, var(--white));
   line-height: 1.6;
+  /* Use Telegram viewport height if available */
+  min-height: calc(var(--vh, 1vh) * 100);
 }
 
 code {

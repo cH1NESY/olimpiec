@@ -35,6 +35,7 @@ Route::get('/stores', [StoreController::class, 'index']);
 // Auth routes with stricter rate limiting
 Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1'); // 5 requests per minute
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // 5 requests per minute
+Route::post('/auth/telegram', [\App\Http\Controllers\Api\TelegramAuthController::class, 'auth'])->middleware('throttle:10,1'); // Telegram auth
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
