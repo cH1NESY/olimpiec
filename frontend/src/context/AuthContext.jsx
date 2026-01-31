@@ -35,28 +35,46 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      // Initialize Telegram Web App if running in Telegram
-      if (isTelegramWebApp()) {
-        initTelegramWebApp()
-        
-        // Try Telegram authentication
-        const initData = getTelegramInitData()
-        if (initData) {
-          await handleTelegramAuth(initData)
-          return
+      try {
+        // Initialize Telegram Web App if running in Telegram
+        if (isTelegramWebApp()) {
+          initTelegramWebApp()
+          
+          // Try Telegram authentication
+          const initData = getTelegramInitData()
+          if (initData) {
+            // Set timeout for Telegram auth to prevent hanging
+            const authPromise = handleTelegramAuth(initData)
+            const timeoutPromise = new Promise((resolve) => {
+              setTimeout(() => {
+                console.warn('Telegram auth timeout, continuing without auth')
+                setLoading(false)
+                resolve()
+              }, 5000) // 5 second timeout
+            })
+            await Promise.race([authPromise, timeoutPromise])
+            return
+          }
         }
-      }
 
-      // Try to get user from localStorage first
-      const storedUser = getStoredUser()
-      const token = localStorage.getItem('auth_token')
-      
-      if (storedUser && token) {
-        setUser(storedUser)
-        setLoading(false)
-        // Then try to fetch from API to verify token
-        await loadUser()
-      } else {
+        // Try to get user from localStorage first
+        const storedUser = getStoredUser()
+        const token = localStorage.getItem('auth_token')
+        
+        if (storedUser && token) {
+          setUser(storedUser)
+          setLoading(false)
+          // Then try to fetch from API to verify token (non-blocking)
+          loadUser().catch(err => {
+            console.error('Error loading user:', err)
+            // Don't block app if user load fails
+          })
+        } else {
+          setUser(null)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
         setUser(null)
         setLoading(false)
       }
