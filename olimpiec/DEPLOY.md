@@ -89,8 +89,8 @@ FRONTEND_URL=https://olimpiec-shop.ru
 
 Перезапустите контейнеры:
 ```bash
-docker compose restart
-docker compose exec php-fpm php artisan config:clear
+docker-compose restart
+docker-compose exec php-fpm php artisan config:clear
 ```
 
 ### 9. Проверка работы
@@ -129,11 +129,11 @@ npm run build
 cd ../olimpiec
 
 # Перезапустить контейнеры
-docker compose restart
+docker-compose restart
 
 # Очистить кэш
-docker compose exec php-fpm php artisan config:clear
-docker compose exec php-fpm php artisan cache:clear
+docker-compose exec php-fpm php artisan config:clear
+docker-compose exec php-fpm php artisan cache:clear
 ```
 
 ---
@@ -167,17 +167,17 @@ sudo ufw enable
 
 ```bash
 # Логи Docker контейнеров
-docker compose logs -f
+docker-compose logs -f
 
 # Логи Nginx
 sudo tail -f /var/log/nginx/olimpiec-shop-access.log
 sudo tail -f /var/log/nginx/olimpiec-shop-error.log
 
 # Логи Laravel
-docker compose exec php-fpm tail -f storage/logs/laravel.log
+docker-compose exec php-fpm tail -f storage/logs/laravel.log
 
 # Статус контейнеров
-docker compose ps
+docker-compose ps
 
 # Использование ресурсов
 docker stats
@@ -191,10 +191,10 @@ docker stats
 
 ```bash
 # Создать бэкап
-docker compose exec postgres pg_dump -U olimpiec olimpiec > backup_$(date +%Y%m%d_%H%M%S).sql
+docker-compose exec postgres pg_dump -U olimpiec olimpiec > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Восстановить из бэкапа
-docker compose exec -T postgres psql -U olimpiec olimpiec < backup.sql
+docker-compose exec -T postgres psql -U olimpiec olimpiec < backup.sql
 ```
 
 ### Файлы storage
@@ -216,8 +216,8 @@ tar -czf storage_backup_$(date +%Y%m%d_%H%M%S).tar.gz storage/app/public
 
 ### Проблема: 502 Bad Gateway
 
-1. Проверьте, что контейнеры запущены: `docker compose ps`
-2. Проверьте логи: `docker compose logs web`
+1. Проверьте, что контейнеры запущены: `docker-compose ps`
+2. Проверьте логи: `docker-compose logs web`
 3. Проверьте, что порты открыты: `sudo netstat -tlnp | grep -E '5173|8080'`
 
 ### Проблема: SSL не работает
@@ -232,25 +232,25 @@ tar -czf storage_backup_$(date +%Y%m%d_%H%M%S).tar.gz storage/app/public
 
 ```bash
 # Перезапуск всех контейнеров
-docker compose restart
+docker-compose restart
 
 # Перезапуск конкретного сервиса
-docker compose restart php-fpm
+docker-compose restart php-fpm
 
 # Просмотр логов
-docker compose logs -f php-fpm
+docker-compose logs -f php-fpm
 
 # Выполнение команд в контейнере
-docker compose exec php-fpm php artisan migrate
+docker-compose exec php-fpm php artisan migrate
 
 # Очистка кэша
-docker compose exec php-fpm php artisan config:clear
-docker compose exec php-fpm php artisan cache:clear
-docker compose exec php-fpm php artisan route:clear
-docker compose exec php-fpm php artisan view:clear
+docker-compose exec php-fpm php artisan config:clear
+docker-compose exec php-fpm php artisan cache:clear
+docker-compose exec php-fpm php artisan route:clear
+docker-compose exec php-fpm php artisan view:clear
 
 # Обновление зависимостей
-docker compose exec php-fpm composer install --no-dev --optimize-autoloader
+docker-compose exec php-fpm composer install --no-dev --optimize-autoloader
 ```
 
 ---

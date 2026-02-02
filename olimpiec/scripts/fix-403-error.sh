@@ -10,9 +10,19 @@ echo ""
 
 # Проверка Docker контейнеров
 echo "1. Проверка Docker контейнеров..."
-if ! docker compose ps | grep -q "Up"; then
+# Проверяем, какая команда доступна
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    echo "   ❌ Docker Compose не найден!"
+    exit 1
+fi
+
+if ! $DOCKER_COMPOSE_CMD ps | grep -q "Up"; then
     echo "   ⚠️  Контейнеры не запущены. Запускаю..."
-    docker compose up -d
+    $DOCKER_COMPOSE_CMD up -d
     echo "   ⏳ Ожидание запуска контейнеров..."
     sleep 15
 else
@@ -27,7 +37,7 @@ if curl -s http://localhost:5173 > /dev/null; then
 else
     echo "   ❌ Порт 5173 недоступен"
     echo "   Проверяю контейнер frontend..."
-    docker compose logs frontend --tail 20
+    $DOCKER_COMPOSE_CMD logs frontend --tail 20
 fi
 
 if curl -s http://localhost:8080/api/health > /dev/null 2>&1; then
@@ -81,7 +91,7 @@ if curl -s http://127.0.0.1:5173 > /dev/null; then
 else
     echo "   ❌ Nginx не может подключиться к frontend"
     echo "   Проверяю, слушает ли контейнер на всех интерфейсах..."
-    docker compose ps frontend
+    $DOCKER_COMPOSE_CMD ps frontend
 fi
 
 if curl -s http://127.0.0.1:8080 > /dev/null 2>&1; then
@@ -95,9 +105,9 @@ echo ""
 echo "📋 Рекомендации:"
 echo ""
 echo "Если проблема сохраняется:"
-echo "1. Проверьте, что контейнеры запущены: docker compose ps"
-echo "2. Проверьте логи: docker compose logs frontend"
+echo "1. Проверьте, что контейнеры запущены: docker-compose ps"
+echo "2. Проверьте логи: docker-compose logs frontend"
 echo "3. Проверьте логи Nginx: sudo tail -f /var/log/nginx/olimpiec-shop-error.log"
 echo "4. Убедитесь, что порт 5173 открыт для localhost: netstat -tlnp | grep 5173"
-echo "5. Перезапустите контейнеры: docker compose restart"
+echo "5. Перезапустите контейнеры: docker-compose restart"
 echo ""

@@ -56,9 +56,19 @@ chmod -R 755 dist 2>/dev/null || true
 
 cd ../olimpiec
 
+# Определяем команду docker-compose
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    echo "❌ Docker Compose не найден!"
+    exit 1
+fi
+
 echo ""
 echo "🐳 Запуск Docker контейнеров..."
-docker compose up -d
+$DOCKER_COMPOSE_CMD up -d
 
 echo ""
 echo "⏳ Ожидание запуска контейнеров..."
@@ -66,22 +76,22 @@ sleep 10
 
 echo ""
 echo "🔑 Генерация APP_KEY..."
-docker compose exec -T php-fpm php artisan key:generate --force
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan key:generate --force
 
 echo ""
 echo "🗄️  Запуск миграций..."
-docker compose exec -T php-fpm php artisan migrate --force
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan migrate --force
 
 echo ""
 echo "🔗 Создание символической ссылки для storage..."
-docker compose exec -T php-fpm php artisan storage:link || true
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan storage:link || true
 
 echo ""
 echo "🧹 Очистка кэша..."
-docker compose exec -T php-fpm php artisan config:clear
-docker compose exec -T php-fpm php artisan cache:clear
-docker compose exec -T php-fpm php artisan route:clear
-docker compose exec -T php-fpm php artisan view:clear
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan config:clear
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan cache:clear
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan route:clear
+$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan view:clear
 
 echo ""
 echo "✅ Настройка завершена!"

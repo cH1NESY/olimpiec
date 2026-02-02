@@ -11,12 +11,12 @@
 #### 1. Проверьте, что Docker контейнеры запущены:
 
 ```bash
-docker compose ps
+docker-compose ps
 ```
 
 Если контейнеры не запущены:
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 #### 2. Проверьте доступность портов:
@@ -44,7 +44,7 @@ sudo tail -f /var/log/nginx/olimpiec-shop-error.log
 #### 5. Перезапустите контейнеры и Nginx:
 
 ```bash
-docker compose restart
+docker-compose restart
 sudo systemctl reload nginx
 ```
 
@@ -148,12 +148,12 @@ npm run build
 
 1. Проверьте, что backend контейнер запущен:
    ```bash
-   docker compose ps web
+   docker-compose ps web
    ```
 
 2. Проверьте логи backend:
    ```bash
-   docker compose logs web
+   docker-compose logs web
    ```
 
 3. Проверьте конфигурацию Nginx:
@@ -178,18 +178,18 @@ npm run build
 
 1. Проверьте символическую ссылку:
    ```bash
-   docker compose exec php-fpm ls -la public/storage
+   docker-compose exec php-fpm ls -la public/storage
    ```
 
 2. Создайте ссылку заново:
    ```bash
-   docker compose exec php-fpm php artisan storage:link
+   docker-compose exec php-fpm php artisan storage:link
    ```
 
 3. Проверьте права доступа:
    ```bash
-   docker compose exec php-fpm chmod -R 755 storage
-   docker compose exec php-fpm chown -R www-data:www-data storage
+   docker-compose exec php-fpm chmod -R 755 storage
+   docker-compose exec php-fpm chown -R www-data:www-data storage
    ```
 
 ---
@@ -198,15 +198,15 @@ npm run build
 
 ```bash
 # Статус контейнеров
-docker compose ps
+docker-compose ps
 
 # Логи всех контейнеров
-docker compose logs -f
+docker-compose logs -f
 
 # Логи конкретного контейнера
-docker compose logs -f frontend
-docker compose logs -f web
-docker compose logs -f php-fpm
+docker-compose logs -f frontend
+docker-compose logs -f web
+docker-compose logs -f php-fpm
 
 # Проверка портов
 netstat -tlnp | grep -E '5173|8080'
@@ -243,7 +243,7 @@ npm run build
 
 # 3. Перезапуск контейнеров
 cd ../olimpiec
-docker compose restart
+docker-compose restart
 
 # 4. Перезагрузка Nginx
 sudo systemctl reload nginx
