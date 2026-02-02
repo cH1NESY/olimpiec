@@ -30,11 +30,30 @@ fi
 
 echo "📦 Сборка фронтенда..."
 cd ../frontend
+
+# Исправление прав доступа
+echo "   Исправление прав доступа..."
+sudo chown -R $USER:$USER . 2>/dev/null || true
+chmod -R 755 . 2>/dev/null || true
+
+# Очистка и создание dist директории
+if [ -d "dist" ]; then
+    rm -rf dist
+fi
+mkdir -p dist
+chmod 755 dist
+
 if [ ! -d "node_modules" ]; then
     echo "   Установка зависимостей..."
     npm install
 fi
+
+echo "   Сборка проекта..."
 npm run build
+
+# Исправление прав для собранных файлов
+chmod -R 755 dist 2>/dev/null || true
+
 cd ../olimpiec
 
 echo ""
