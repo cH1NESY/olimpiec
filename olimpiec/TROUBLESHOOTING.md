@@ -1,253 +1,260 @@
-# Решение проблем при развертывании
+# Устранение проблем
 
-## Проблема: 403 Forbidden
+Этот документ содержит решения распространенных проблем при развертывании и работе приложения.
 
-### Симптомы:
-- При обращении к домену получаете `403 Forbidden`
-- В логах Nginx ошибки доступа
+## Ошибка: "No application encryption key has been specified"
 
-### Решения:
+**Причина:** В файле `.env` не установлен `APP_KEY`.
 
-#### 1. Проверьте, что Docker контейнеры запущены:
+**Решение:**
 
+```bash
+cd ~/olimpiec/olimpiec
+./scripts/generate-app-key.sh
+```
+
+Или вручную:
+
+```bash
+docker-compose exec php-fpm php artisan key:generate --force
+docker-compose exec php-fpm php artisan config:clear
+docker-compose exec php-fpm php artisan cache:clear
+```
+
+## Ошибка: "relation 'users' does not exist"
+
+**Причина:** Миграции базы данных не выполнены.
+
+**Решение:**
+
+```bash
+cd ~/olimpiec/olimpiec
+./scripts/run-migrations.sh
+```
+
+Или вручную:
+
+```bash
+docker-compose exec php-fpm php artisan migrate --force
+```
+
+## Ошибка: "Failed to open stream: No such file or directory in /var/www/html/vendor/autoload.php"
+
+**Причина:** Зависимости Composer не установлены.
+
+**Решение:**
+
+```bash
+cd ~/olimpiec/olimpiec
+./scripts/install-dependencies.sh
+```
+
+Или вручную:
+
+```bash
+docker-compose exec php-fpm composer install --no-dev --optimize-autoloader
+```
+
+## Ошибка: 403 Forbidden от Nginx
+
+**Причина:** Контейнеры не запущены или порты недоступны.
+
+**Решение:**
+
+1. Проверьте статус контейнеров:
 ```bash
 docker-compose ps
 ```
 
-Если контейнеры не запущены:
+2. Если контейнеры не запущены:
 ```bash
 docker-compose up -d
 ```
 
-#### 2. Проверьте доступность портов:
-
+3. Проверьте доступность портов:
 ```bash
-# Проверка frontend
 curl http://localhost:5173
-
-# Проверка backend
 curl http://localhost:8080/api/health
 ```
 
-#### 3. Используйте скрипт диагностики:
+4. Проверьте логи:
+```bash
+docker-compose logs frontend
+docker-compose logs nginx
+sudo tail -20 /var/log/nginx/olimpiec-shop-error.log
+```
+
+## Ошибка: 500 Internal Server Error
+
+**Возможные причины:**
+
+1. **APP_KEY не установлен** - см. выше
+2. **Проблемы с базой данных** - проверьте подключение
+3. **Проблемы с правами доступа** - проверьте права на storage
+
+**Решение:**
 
 ```bash
-./scripts/fix-403-error.sh
+# 1. Проверьте APP_KEY
+grep APP_KEY .env
+
+# 2. Проверьте подключение к БД
+docker-compose exec php-fpm php artisan tinker
+# В консоли: DB::connection()->getPdo();
+
+# 3. Проверьте права доступа
+sudo chown -R $USER:$USER storage bootstrap/cache
+chmod -R 775 storage bootstrap/cache
+
+# 4. Проверьте логи
+docker-compose logs php-fpm
+tail -50 storage/logs/laravel.log
 ```
 
-#### 4. Проверьте логи Nginx:
+## Ошибка: "Connection refused" при подключении к базе данных
+
+**Причина:** Контейнер PostgreSQL не запущен или неправильные настройки подключения.
+
+**Решение:**
+
+1. Проверьте статус контейнера:
+```bash
+docker-compose ps postgres
+```
+
+2. Проверьте настройки в `.env`:
+```env
+DB_CONNECTION=pgsql
+DB_HOST=postgres
+DB_PORT=5432
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+3. Перезапустите контейнеры:
+```bash
+docker-compose restart postgres
+```
+
+## Ошибка: "Storage link not found"
+
+**Причина:** Символическая ссылка для storage не создана.
+
+**Решение:**
 
 ```bash
-sudo tail -f /var/log/nginx/olimpiec-shop-error.log
+docker-compose exec php-fpm php artisan storage:link
 ```
 
-#### 5. Перезапустите контейнеры и Nginx:
+## Ошибка при сборке фронтенда: "EACCES: permission denied"
+
+**Причина:** Недостаточно прав доступа к директории.
+
+**Решение:**
 
 ```bash
-docker-compose restart
-sudo systemctl reload nginx
-```
-
-#### 6. Убедитесь, что порты открыты для localhost:
-
-```bash
-# Проверка портов
-netstat -tlnp | grep -E '5173|8080'
-
-# Должны быть видны:
-# tcp  0  0 0.0.0.0:5173  LISTEN  ...
-# tcp  0  0 127.0.0.1:8080  LISTEN  ...
-```
-
----
-
-## Проблема: Ошибка прав доступа при сборке фронтенда
-
-### Симптомы:
-```
-EACCES: permission denied, copyfile '/path/to/favicon.ico' -> '/path/to/dist/favicon.ico'
-```
-
-### Решение:
-
-```bash
-# Исправление прав доступа
 cd ~/olimpiec/frontend
 sudo chown -R $USER:$USER .
 chmod -R 755 .
 rm -rf dist
 mkdir -p dist
 chmod 755 dist
-
-# Повторная сборка
 npm run build
 ```
 
-Или используйте обновленный скрипт `setup-production.sh`, который автоматически исправляет права.
+## Проблемы с SSL сертификатом
 
----
+### Ошибка: "Failed to obtain certificate"
 
-## Проблема: Домен не резолвится
+**Решение:**
 
-### Симптомы:
-- `nslookup olimpiec-shop.ru` возвращает `NXDOMAIN`
-- DNS записи не найдены
-
-### Решение:
-
-1. Проверьте DNS записи в Yandex Cloud:
-   - Cloud DNS → ваша зона → должны быть A-записи для `@` и `www`
-
-2. Подождите 5-15 минут для распространения DNS
-
-3. Проверьте DNS:
-   ```bash
-   dig olimpiec-shop.ru +short
-   # Должен вернуть: 89.169.187.129
-   ```
-
----
-
-## Проблема: SSL сертификат не работает
-
-### Симптомы:
-- Ошибки при получении сертификата через certbot
-- `ERR_SSL_PROTOCOL_ERROR` в браузере
-
-### Решение:
-
-1. Убедитесь, что DNS настроен:
-   ```bash
-   dig olimpiec-shop.ru +short
-   ```
-
-2. Убедитесь, что порт 80 открыт:
-   ```bash
-   sudo ufw allow 80/tcp
-   ```
-
-3. Проверьте, что домен доступен по HTTP:
-   ```bash
-   curl http://olimpiec-shop.ru
-   ```
-
-4. Переустановите сертификат:
-   ```bash
-   sudo certbot --nginx -d olimpiec-shop.ru -d www.olimpiec-shop.ru --force-renewal
-   ```
-
----
-
-## Проблема: API возвращает 404
-
-### Симптомы:
-- `/api/*` запросы возвращают 404
-- API не работает
-
-### Решение:
-
-1. Проверьте, что backend контейнер запущен:
-   ```bash
-   docker-compose ps web
-   ```
-
-2. Проверьте логи backend:
-   ```bash
-   docker-compose logs web
-   ```
-
-3. Проверьте конфигурацию Nginx:
-   ```bash
-   sudo nginx -t
-   ```
-
-4. Убедитесь, что в `.env` правильный `APP_URL`:
-   ```env
-   APP_URL=https://olimpiec-shop.ru
-   ```
-
----
-
-## Проблема: Изображения не загружаются
-
-### Симптомы:
-- `/storage/*` возвращает 404
-- Изображения товаров не отображаются
-
-### Решение:
-
-1. Проверьте символическую ссылку:
-   ```bash
-   docker-compose exec php-fpm ls -la public/storage
-   ```
-
-2. Создайте ссылку заново:
-   ```bash
-   docker-compose exec php-fpm php artisan storage:link
-   ```
-
-3. Проверьте права доступа:
-   ```bash
-   docker-compose exec php-fpm chmod -R 755 storage
-   docker-compose exec php-fpm chown -R www-data:www-data storage
-   ```
-
----
-
-## Полезные команды для диагностики:
-
+1. Проверьте DNS:
 ```bash
-# Статус контейнеров
-docker-compose ps
-
-# Логи всех контейнеров
-docker-compose logs -f
-
-# Логи конкретного контейнера
-docker-compose logs -f frontend
-docker-compose logs -f web
-docker-compose logs -f php-fpm
-
-# Проверка портов
-netstat -tlnp | grep -E '5173|8080'
-
-# Проверка DNS
-dig olimpiec-shop.ru +short
-nslookup olimpiec-shop.ru
-
-# Проверка Nginx
-sudo nginx -t
-sudo systemctl status nginx
-
-# Логи Nginx
-sudo tail -f /var/log/nginx/olimpiec-shop-access.log
-sudo tail -f /var/log/nginx/olimpiec-shop-error.log
-
-# Проверка файрвола
-sudo ufw status
+dig +short olimpiec-shop.ru
 ```
 
----
+2. Проверьте доступность HTTP:
+```bash
+curl -I http://olimpiec-shop.ru
+```
 
-## Быстрое исправление всех проблем:
+3. Проверьте логи Certbot:
+```bash
+sudo tail -50 /var/log/letsencrypt/letsencrypt.log
+```
+
+## Проблемы с Docker Compose
+
+### Ошибка: "docker: unknown command: docker compose"
+
+**Причина:** Установлена старая версия Docker Compose (через дефис).
+
+**Решение:** Используйте `docker-compose` вместо `docker compose`. Все скрипты автоматически определяют доступную команду.
+
+## Проблемы с кэшем
+
+Если изменения не применяются, очистите кэш:
 
 ```bash
-# 1. Исправление прав доступа
-cd ~/olimpiec/frontend
+docker-compose exec php-fpm php artisan config:clear
+docker-compose exec php-fpm php artisan cache:clear
+docker-compose exec php-fpm php artisan route:clear
+docker-compose exec php-fpm php artisan view:clear
+```
+
+## Проблемы с правами доступа
+
+Если возникают проблемы с правами доступа:
+
+```bash
+# В директории olimpiec/
 sudo chown -R $USER:$USER .
 chmod -R 755 .
-rm -rf dist && mkdir -p dist
 
-# 2. Пересборка фронтенда
-npm run build
+# Для storage и cache
+chmod -R 775 storage bootstrap/cache
+```
 
-# 3. Перезапуск контейнеров
-cd ../olimpiec
-docker-compose restart
+## Полная переустановка
 
-# 4. Перезагрузка Nginx
-sudo systemctl reload nginx
+Если ничего не помогает, выполните полную переустановку:
 
-# 5. Проверка
-curl http://olimpiec-shop.ru
+```bash
+cd ~/olimpiec/olimpiec
+
+# 1. Остановите контейнеры
+docker-compose down
+
+# 2. Удалите volumes (ОСТОРОЖНО: удалит данные БД!)
+# docker-compose down -v
+
+# 3. Пересоберите контейнеры
+docker-compose build --no-cache
+
+# 4. Запустите setup-production.sh
+./scripts/setup-production.sh
+
+# 5. Создайте администратора
+./scripts/create-admin.sh
+```
+
+## Получение помощи
+
+Если проблема не решена:
+
+1. Проверьте логи:
+   - Laravel: `storage/logs/laravel.log`
+   - Docker: `docker-compose logs`
+   - Nginx: `/var/log/nginx/olimpiec-shop-error.log`
+
+2. Проверьте документацию:
+   - `ADMIN_SETUP.md` - создание администратора
+   - `SSL_SETUP.md` - настройка SSL
+   - `NGINX_REVERSE_PROXY_SETUP.md` - настройка Nginx
+
+3. Проверьте статус всех сервисов:
+```bash
+docker-compose ps
+sudo systemctl status nginx
 ```

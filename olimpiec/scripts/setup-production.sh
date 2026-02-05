@@ -86,7 +86,13 @@ fi
 
 echo ""
 echo "🔑 Генерация APP_KEY..."
-$DOCKER_COMPOSE_CMD exec -T php-fpm php artisan key:generate --force
+# Проверяем, есть ли уже APP_KEY в .env
+if grep -q "^APP_KEY=base64:" .env 2>/dev/null || grep -q "^APP_KEY=\"base64:" .env 2>/dev/null; then
+    echo "   APP_KEY уже установлен, пропускаю генерацию"
+else
+    echo "   Генерация нового APP_KEY..."
+    $DOCKER_COMPOSE_CMD exec -T php-fpm php artisan key:generate --force
+fi
 
 echo ""
 echo "🗄️  Запуск миграций..."
