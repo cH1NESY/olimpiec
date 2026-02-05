@@ -23,6 +23,17 @@ if ! $DOCKER_COMPOSE_CMD ps php-fpm | grep -q "Up"; then
     sleep 5
 fi
 
+# Проверяем наличие vendor директории
+echo "🔍 Проверка зависимостей Composer..."
+if ! $DOCKER_COMPOSE_CMD exec -T php-fpm test -d /var/www/html/vendor; then
+    echo "⚠️  Зависимости Composer не установлены. Устанавливаю..."
+    $DOCKER_COMPOSE_CMD exec -T php-fpm composer install --no-dev --optimize-autoloader
+    echo "✅ Зависимости установлены"
+else
+    echo "✅ Зависимости установлены"
+fi
+
+echo ""
 echo "🔐 Создание администратора..."
 echo ""
 

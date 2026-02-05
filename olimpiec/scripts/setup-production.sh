@@ -75,6 +75,16 @@ echo "⏳ Ожидание запуска контейнеров..."
 sleep 10
 
 echo ""
+echo "📦 Установка зависимостей Composer..."
+if [ ! -d "vendor" ]; then
+    echo "   Установка зависимостей..."
+    $DOCKER_COMPOSE_CMD exec -T php-fpm composer install --no-dev --optimize-autoloader
+else
+    echo "   Зависимости уже установлены, обновление..."
+    $DOCKER_COMPOSE_CMD exec -T php-fpm composer install --no-dev --optimize-autoloader
+fi
+
+echo ""
 echo "🔑 Генерация APP_KEY..."
 $DOCKER_COMPOSE_CMD exec -T php-fpm php artisan key:generate --force
 
