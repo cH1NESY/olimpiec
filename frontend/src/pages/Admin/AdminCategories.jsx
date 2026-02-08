@@ -22,9 +22,27 @@ const AdminCategories = () => {
     setLoading(true)
     try {
       const response = await adminGetCategories()
-      setCategories(response.data || [])
+      
+      // Use 'all' if available (flat list), otherwise flatten from tree structure
+      let allCategories = []
+      if (response.all && Array.isArray(response.all)) {
+        allCategories = response.all
+      } else {
+        const rootCategories = response.data || []
+        // Flatten categories: include root categories and their children
+        rootCategories.forEach(cat => {
+          allCategories.push(cat)
+          if (cat.children && cat.children.length > 0) {
+            allCategories.push(...cat.children)
+          }
+        })
+      }
+      
+      console.log('Loaded categories:', allCategories)
+      setCategories(allCategories)
     } catch (error) {
       console.error('Error loading categories:', error)
+      console.error('Error response:', error.response)
     } finally {
       setLoading(false)
     }
@@ -40,18 +58,30 @@ const AdminCategories = () => {
         sort_order: parseInt(formData.sort_order) || 0
       }
 
+      let result
       if (editingCategory) {
-        await adminUpdateCategory(editingCategory.id, submitData)
+        result = await adminUpdateCategory(editingCategory.id, submitData)
       } else {
-        await adminCreateCategory(submitData)
+        result = await adminCreateCategory(submitData)
+        console.log('Category created:', result)
       }
-      setShowForm(false)
-      setEditingCategory(null)
-      setFormData({ name: '', description: '', parent_id: '', sort_order: 0 })
-      loadCategories()
+      
+      if (result.success) {
+        setShowForm(false)
+        setEditingCategory(null)
+        setFormData({ name: '', description: '', parent_id: '', sort_order: 0 })
+        // Reload categories after a short delay to ensure DB is updated
+        setTimeout(() => {
+          loadCategories()
+        }, 300)
+      }
     } catch (error) {
       console.error('Error saving category:', error)
-      const errorMessage = error.response?.data?.message || error.response?.data?.errors?.parent_id?.[0] || 'Ошибка при сохранении категории'
+      console.error('Error response:', error.response)
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.errors?.parent_id?.[0] || 
+                          error.response?.data?.errors?.name?.[0] ||
+                          'Ошибка при сохранении категории'
       alert(errorMessage)
     }
   }
@@ -89,8 +119,16 @@ const AdminCategories = () => {
 
   const getCategoryPath = (category) => {
     if (!category.parent_id) return category.name
+    // Try to find parent in current categories list
     const parent = categories.find(c => c.id === category.parent_id)
-    return parent ? `${parent.name} > ${category.name}` : category.name
+    if (parent) {
+      return `${parent.name} > ${category.name}`
+    }
+    // If parent not found in list, try to get from parent relation
+    if (category.parent) {
+      return `${category.parent.name} > ${category.name}`
+    }
+    return category.name
   }
 
   return (
@@ -174,30 +212,38 @@ const AdminCategories = () => {
               </tr>
             </thead>
             <tbody>
-              {categories.map(category => (
-                <tr key={category.id}>
-                  <td>{category.id}</td>
-                  <td>{category.name}</td>
-                  <td>{getCategoryPath(category)}</td>
-                  <td>{category.sort_order}</td>
-                  <td>
-                    <div className="admin-actions">
-                      <button
-                        onClick={() => handleEdit(category)}
-                        className="btn-action btn-edit"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => handleDelete(category.id)}
-                        className="btn-action btn-delete"
-                      >
-                        🗑️
-                      </button>
-                    </div>
+              {categories.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '20px' }}>
+                    Нет категорий
                   </td>
                 </tr>
-              ))}
+              ) : (
+                categories.map(category => (
+                  <tr key={category.id}>
+                    <td>{category.id}</td>
+                    <td>{category.name}</td>
+                    <td>{getCategoryPath(category)}</td>
+                    <td>{category.sort_order}</td>
+                    <td>
+                      <div className="admin-actions">
+                        <button
+                          onClick={() => handleEdit(category)}
+                          className="btn-action btn-edit"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => handleDelete(category.id)}
+                          className="btn-action btn-delete"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

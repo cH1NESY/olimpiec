@@ -15,7 +15,14 @@ class AdminCategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = Category::with('children')
+        // Get all categories (both root and children) for admin panel
+        $allCategories = Category::with('parent')
+            ->orderBy('sort_order')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        // Also return root categories with children for tree structure
+        $rootCategories = Category::with('children')
             ->whereNull('parent_id')
             ->orderBy('sort_order')
             ->orderBy('id', 'asc')
@@ -23,7 +30,8 @@ class AdminCategoryController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $categories
+            'data' => $rootCategories, // For backward compatibility
+            'all' => $allCategories // Flat list of all categories
         ]);
     }
 
