@@ -2,9 +2,25 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Use Telegram viewport height if available */
+  min-height: calc(var(--vh, 1vh) * 100);
 }
 
 .main-content {
   flex: 1;
   padding-top: 80px;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .main-content {
+    padding-top: 70px;
+  }
+}
+
+/* Telegram Mini App optimizations */
+.telegram-active .main-content {
+  padding-top: 60px;
+  /* Account for Telegram header */
+  padding-bottom: env(safe-area-inset-bottom, 0);
 }

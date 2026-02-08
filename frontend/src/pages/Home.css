@@ -182,16 +182,86 @@
   color: var(--gray-dark);
 }
 
+/* Mobile and Telegram Mini App optimizations */
 @media (max-width: 768px) {
+  .hero {
+    padding: 40px 0;
+  }
+
   .hero-title {
-    font-size: 40px;
+    font-size: 36px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
   }
 
   .hero-subtitle {
-    font-size: 20px;
+    font-size: 18px;
+    margin-bottom: 16px;
   }
 
   .hero-description {
-    font-size: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    padding: 0 10px;
   }
+
+  .hero-cta {
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+
+  .features {
+    padding: 40px 0;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 10px;
+  }
+
+  .feature-card {
+    padding: 24px 20px;
+  }
+
+  .feature-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+  }
+
+  .feature-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .feature-text {
+    font-size: 14px;
+  }
+}
+
+/* Telegram Mini App specific styles */
+.telegram-active .hero {
+  padding: 30px 0;
+}
+
+.telegram-active .hero-title {
+  font-size: 32px;
+}
+
+.telegram-active .hero-subtitle {
+  font-size: 16px;
+}
+
+.telegram-active .hero-description {
+  font-size: 13px;
+  padding: 0 15px;
+}
+
+.telegram-active .features {
+  padding: 30px 0;
+}
+
+.telegram-active .container {
+  padding: 0 15px;
 }

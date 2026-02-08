@@ -26,5 +26,20 @@
 @media (max-width: 768px) {
   .telegram-wrapper.telegram-active {
     /* Additional mobile optimizations */
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .telegram-wrapper.telegram-active * {
+    /* Prevent text selection issues on mobile */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  .telegram-wrapper.telegram-active input,
+  .telegram-wrapper.telegram-active textarea,
+  .telegram-wrapper.telegram-active select {
+    /* Prevent zoom on focus in Telegram */
+    font-size: 16px !important;
   }
 }

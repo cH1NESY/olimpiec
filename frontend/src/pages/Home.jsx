@@ -41,38 +41,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      <section className="categories-preview">
-        <div className="container">
-          <h2 className="section-title">Популярные категории</h2>
-          <div className="categories-grid">
-            <Link to="/catalog/komplekty" className="category-card">
-              <div className="category-icon">👕</div>
-              <h3 className="category-name">Комплекты</h3>
-            </Link>
-            <Link to="/catalog/sportivnye-kostyumy" className="category-card">
-              <div className="category-icon">👔</div>
-              <h3 className="category-name">Спортивные костюмы</h3>
-            </Link>
-            <Link to="/catalog/kurtki" className="category-card">
-              <div className="category-icon">🧥</div>
-              <h3 className="category-name">Куртки</h3>
-            </Link>
-            <Link to="/catalog/futbolki" className="category-card">
-              <div className="category-icon">👕</div>
-              <h3 className="category-name">Футболки</h3>
-            </Link>
-            <Link to="/catalog/sportivnye-bryuki" className="category-card">
-              <div className="category-icon">👖</div>
-              <h3 className="category-name">Спортивные брюки</h3>
-            </Link>
-            <Link to="/catalog/borcovki" className="category-card">
-              <div className="category-icon">👟</div>
-              <h3 className="category-name">Борцовки</h3>
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

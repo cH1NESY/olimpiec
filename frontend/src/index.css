@@ -69,6 +69,35 @@ body {
   line-height: 1.6;
   /* Use Telegram viewport height if available */
   min-height: calc(var(--vh, 1vh) * 100);
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+  /* Better touch targets for mobile */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+  
+  .container {
+    padding: 0 15px;
+  }
+}
+
+/* Telegram Mini App optimizations */
+.telegram-active {
+  /* Use safe area insets for Telegram */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.telegram-active body {
+  /* Prevent zoom on input focus in Telegram */
+  touch-action: manipulation;
 }
 
 code {
@@ -95,6 +124,18 @@ input, textarea, select {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+/* Mobile container adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+}
+
+/* Telegram Mini App container adjustments */
+.telegram-active .container {
+  padding: 0 12px;
 }
 
 .btn {

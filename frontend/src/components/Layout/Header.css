@@ -232,16 +232,28 @@
 }
 
 @media (max-width: 768px) {
+  .header {
+    /* Adjust for Telegram safe area */
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
   .logo-image {
-    height: 40px;
+    height: 36px;
   }
 
   .logo-text {
-    font-size: 18px;
+    font-size: 16px;
+    letter-spacing: 1px;
   }
 
   .logo-subtitle {
-    font-size: 10px;
+    font-size: 9px;
+  }
+
+  .header-content {
+    flex-wrap: wrap;
+    padding: 12px 0;
+    gap: 12px;
   }
 
   .nav {
@@ -257,6 +269,7 @@
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
+    z-index: 999;
   }
 
   .nav-open {
@@ -265,18 +278,69 @@
     visibility: visible;
   }
 
-  .menu-toggle {
-    display: flex;
+  .nav-link {
+    padding: 12px 0;
+    font-size: 16px;
   }
 
-  .header-content {
-    flex-wrap: wrap;
+  .menu-toggle {
+    display: flex;
   }
 
   .header-actions {
     order: 3;
     width: 100%;
     justify-content: space-between;
-    margin-top: 12px;
+    margin-top: 8px;
+    gap: 8px;
   }
+
+  .header-icon-box {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-icon {
+    padding: 6px;
+  }
+
+  .header-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* Telegram Mini App specific optimizations */
+.telegram-active .header {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+.telegram-active .header-content {
+  padding: 10px 0;
+}
+
+.telegram-active .logo-image {
+  height: 32px;
+}
+
+.telegram-active .logo-text {
+  font-size: 14px;
+}
+
+.telegram-active .logo-subtitle {
+  font-size: 8px;
+}
+
+.telegram-active .header-actions {
+  gap: 6px;
+}
+
+.telegram-active .header-icon-box {
+  width: 36px;
+  height: 36px;
+}
+
+.telegram-active .header-icon svg {
+  width: 16px;
+  height: 16px;
 }
