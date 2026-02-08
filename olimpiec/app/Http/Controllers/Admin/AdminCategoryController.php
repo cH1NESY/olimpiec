@@ -39,6 +39,13 @@ class AdminCategoryController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
 
+        // Convert empty string to null for parent_id
+        if (isset($validated['parent_id']) && ($validated['parent_id'] === '' || $validated['parent_id'] === null)) {
+            $validated['parent_id'] = null;
+        } elseif (isset($validated['parent_id'])) {
+            $validated['parent_id'] = (int)$validated['parent_id'];
+        }
+
         $validated['slug'] = Str::slug($validated['name']);
         
         // Ensure unique slug
@@ -85,6 +92,32 @@ class AdminCategoryController extends Controller
             'sort_order' => 'integer|min:0',
         ]);
 
+        // Convert empty string to null for parent_id
+        if (isset($validated['parent_id']) && ($validated['parent_id'] === '' || $validated['parent_id'] === null)) {
+            $validated['parent_id'] = null;
+        } elseif (isset($validated['parent_id'])) {
+            $validated['parent_id'] = (int)$validated['parent_id'];
+        }
+
+        // Prevent category from being its own parent
+        if ($validated['parent_id'] == $id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Категория не может быть родительской для самой себя'
+            ], 400);
+        }
+
+        // Prevent circular references (parent cannot be a child of this category)
+        if ($validated['parent_id']) {
+            $parent = Category::find($validated['parent_id']);
+            if ($parent && $this->isDescendant($parent, $id)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Невозможно установить родительскую категорию: это создаст циклическую ссылку'
+                ], 400);
+            }
+        }
+
         // Update slug if name changed
         if ($category->name !== $validated['name']) {
             $validated['slug'] = Str::slug($validated['name']);
@@ -126,5 +159,26 @@ class AdminCategoryController extends Controller
             'success' => true,
             'message' => 'Категория успешно удалена'
         ]);
+    }
+
+    /**
+     * Check if a category is a descendant of another category
+     */
+    private function isDescendant(Category $category, int $ancestorId): bool
+    {
+        if ($category->parent_id == $ancestorId) {
+            return true;
+        }
+        
+        if ($category->parent_id === null) {
+            return false;
+        }
+        
+        $parent = Category::find($category->parent_id);
+        if (!$parent) {
+            return false;
+        }
+        
+        return $this->isDescendant($parent, $ancestorId);
     }
 }

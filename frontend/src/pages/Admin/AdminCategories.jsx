@@ -33,10 +33,17 @@ const AdminCategories = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      // Prepare data - convert empty string to null for parent_id
+      const submitData = {
+        ...formData,
+        parent_id: formData.parent_id === '' ? null : (formData.parent_id ? parseInt(formData.parent_id) : null),
+        sort_order: parseInt(formData.sort_order) || 0
+      }
+
       if (editingCategory) {
-        await adminUpdateCategory(editingCategory.id, formData)
+        await adminUpdateCategory(editingCategory.id, submitData)
       } else {
-        await adminCreateCategory(formData)
+        await adminCreateCategory(submitData)
       }
       setShowForm(false)
       setEditingCategory(null)
@@ -44,7 +51,8 @@ const AdminCategories = () => {
       loadCategories()
     } catch (error) {
       console.error('Error saving category:', error)
-      alert('Ошибка при сохранении категории')
+      const errorMessage = error.response?.data?.message || error.response?.data?.errors?.parent_id?.[0] || 'Ошибка при сохранении категории'
+      alert(errorMessage)
     }
   }
 
