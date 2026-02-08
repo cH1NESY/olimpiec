@@ -51,9 +51,10 @@ const AdminProductForm = () => {
 
   const loadFormData = async () => {
     setLoadingData(true)
+    let categoriesRes, brandsRes, sizesRes
     try {
       // Load categories, brands, sizes
-      const [categoriesRes, brandsRes, sizesRes] = await Promise.all([
+      [categoriesRes, brandsRes, sizesRes] = await Promise.all([
         adminGetCategories(),
         adminGetBrands(),
         getSizes()
@@ -61,7 +62,9 @@ const AdminProductForm = () => {
       
       setCategories(categoriesRes.data || [])
       setBrands(brandsRes.data || [])
-      setAvailableSizes(sizesRes.data || [])
+      const sizesData = sizesRes.data || []
+      console.log('Loaded sizes:', sizesData)
+      setAvailableSizes(sizesData)
 
       // If editing, load product data
       if (isEdit) {
@@ -104,7 +107,10 @@ const AdminProductForm = () => {
       }
     } catch (error) {
       console.error('Error loading form data:', error)
-      alert('Ошибка при загрузке данных')
+      console.error('Categories response:', categoriesRes)
+      console.error('Brands response:', brandsRes)
+      console.error('Sizes response:', sizesRes)
+      alert('Ошибка при загрузке данных: ' + (error.message || 'Неизвестная ошибка'))
     } finally {
       setLoadingData(false)
     }
@@ -464,6 +470,11 @@ const AdminProductForm = () => {
 
         <div className="form-section">
           <h3>Размеры и остатки</h3>
+          {availableSizes.length === 0 && (
+            <p style={{ color: '#999', fontStyle: 'italic' }}>
+              Загрузка размеров... (если размеры не загружаются, проверьте консоль браузера)
+            </p>
+          )}
           <div className="sizes-grid">
             {availableSizes.map(size => {
               const selectedSize = formData.sizes.find(s => s.size_id === size.id)
@@ -531,7 +542,7 @@ const AdminProductForm = () => {
                           alt={`Изображение ${index + 1}`}
                           onError={(e) => {
                             console.error('Image load error:', imageUrl)
-                            e.target.src = 'https://via.placeholder.com/200x200?text=No+Image'
+                            e.target.src = '/placeholder.svg'
                           }}
                         />
                       <div className="image-actions">

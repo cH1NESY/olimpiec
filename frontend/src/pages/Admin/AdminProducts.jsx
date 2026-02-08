@@ -203,7 +203,7 @@ const AdminProducts = () => {
                             alt={product.name}
                             className="product-thumb"
                             onError={(e) => {
-                              e.target.src = 'https://via.placeholder.com/150x150?text=No+Image'
+                              e.target.src = '/placeholder.svg'
                             }}
                           />
                         )

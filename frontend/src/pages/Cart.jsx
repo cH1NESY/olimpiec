@@ -34,7 +34,7 @@ const Cart = () => {
                     src={item.image || (item.images && item.images[0]) || '/api/placeholder/150/150'} 
                     alt={item.name}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/150x150?text=No+Image'
+                      e.target.src = '/placeholder.svg'
                     }}
                   />
                 </Link>
