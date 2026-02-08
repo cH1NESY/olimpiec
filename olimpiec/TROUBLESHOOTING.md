@@ -2,6 +2,35 @@
 
 Этот документ содержит решения распространенных проблем при развертывании и работе приложения.
 
+## Ошибка: 429 (Too Many Requests)
+
+**Причина:** Сработал rate limiting из-за слишком частых запросов к API.
+
+**Решение:**
+
+1. **Очистите rate limit кэш:**
+```bash
+cd ~/olimpiec/olimpiec
+./scripts/clear-rate-limit.sh
+```
+
+2. **Подождите 1 минуту** и попробуйте снова.
+
+3. **Если проблема повторяется**, проверьте логи:
+```bash
+docker-compose logs nginx | grep "429"
+docker-compose logs php-fpm | grep "429"
+```
+
+4. **Перезапустите контейнеры:**
+```bash
+docker-compose restart
+```
+
+**Примечание:** Лимиты были увеличены:
+- `/auth/login` и `/auth/register`: 10 запросов в минуту (было 5)
+- `/auth/telegram`: 20 запросов в минуту (было 10)
+
 ## Ошибка: "No application encryption key has been specified"
 
 **Причина:** В файле `.env` не установлен `APP_KEY`.

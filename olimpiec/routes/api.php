@@ -32,10 +32,10 @@ Route::post('/products/{productId}/reviews', [\App\Http\Controllers\Api\ReviewCo
 
 Route::get('/stores', [StoreController::class, 'index']);
 
-// Auth routes with stricter rate limiting
-Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:5,1'); // 5 requests per minute
-Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // 5 requests per minute
-Route::post('/auth/telegram', [\App\Http\Controllers\Api\TelegramAuthController::class, 'auth'])->middleware('throttle:10,1'); // Telegram auth
+// Auth routes with rate limiting
+Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:10,1'); // 10 requests per minute
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1'); // 10 requests per minute
+Route::post('/auth/telegram', [\App\Http\Controllers\Api\TelegramAuthController::class, 'auth'])->middleware('throttle:20,1'); // Telegram auth - 20 requests per minute
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
