@@ -158,6 +158,26 @@
     max-width: 100%;
     order: -1;
     width: 100%;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .search-bar {
+    border-width: 1px;
+  }
+
+  .search-input {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .search-btn {
+    padding: 6px 10px;
+  }
+
+  .search-btn svg {
+    width: 14px;
+    height: 14px;
   }
 
   .search-suggestions {

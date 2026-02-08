@@ -4,17 +4,22 @@
   flex-direction: column;
   /* Use Telegram viewport height if available */
   min-height: calc(var(--vh, 1vh) * 100);
+  /* Force white background */
+  background-color: var(--white) !important;
 }
 
 .main-content {
   flex: 1;
   padding-top: 80px;
+  /* Force white background */
+  background-color: var(--white) !important;
 }
 
 /* Mobile optimizations */
 @media (max-width: 768px) {
   .main-content {
-    padding-top: 70px;
+    padding-top: 60px;
+    background-color: var(--white) !important;
   }
 }
 

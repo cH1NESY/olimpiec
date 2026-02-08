@@ -65,7 +65,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--tg-theme-text-color, var(--gray-dark));
-  background-color: var(--tg-theme-bg-color, var(--white));
+  /* Force white background, ignore Telegram dark theme for now */
+  background-color: var(--white) !important;
   line-height: 1.6;
   /* Use Telegram viewport height if available */
   min-height: calc(var(--vh, 1vh) * 100);

@@ -22,11 +22,28 @@ const Header = () => {
     navigate('/')
   }
 
+  // Функция для прокрутки вверх при переходе
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
+  // Обработчик клика на ссылку навигации
+  const handleNavClick = () => {
+    setIsMenuOpen(false)
+    // Небольшая задержка для того, чтобы React Router успел перейти на новую страницу
+    setTimeout(() => {
+      scrollToTop()
+    }, 100)
+  }
+
   return (
     <header className={`header ${isMenuOpen ? 'menu-open' : ''}`}>
       <div className="container">
         <div className="header-content">
-          <Link to="/" className="logo">
+          <Link to="/" className="logo" onClick={scrollToTop}>
             <img src="/olimp-logo.jpg" alt="Олимпиец" className="logo-image" />
             <div className="logo-text-wrapper">
               <span className="logo-text">ОЛИМПИЕЦ</span>
@@ -44,13 +61,13 @@ const Header = () => {
             }}
           >
             <div onClick={(e) => e.stopPropagation()}>
-              <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/" className="nav-link" onClick={handleNavClick}>
                 Главная
               </Link>
-              <Link to="/catalog" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/catalog" className="nav-link" onClick={handleNavClick}>
                 Каталог
               </Link>
-              <Link to="/stores" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+              <Link to="/stores" className="nav-link" onClick={handleNavClick}>
                 Магазины
               </Link>
             </div>
