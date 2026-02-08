@@ -60,7 +60,24 @@ const AdminProductForm = () => {
         getSizes()
       ])
       
-      setCategories(categoriesRes.data || [])
+      // Use 'all' categories if available (includes children), otherwise use data (root only)
+      const allCategories = categoriesRes.all && Array.isArray(categoriesRes.all) 
+        ? categoriesRes.all 
+        : (() => {
+            // Flatten tree structure if 'all' is not available
+            const rootCategories = categoriesRes.data || []
+            const flattened = []
+            rootCategories.forEach(cat => {
+              flattened.push(cat)
+              if (cat.children && cat.children.length > 0) {
+                flattened.push(...cat.children)
+              }
+            })
+            return flattened
+          })()
+      
+      console.log('Loaded categories:', allCategories)
+      setCategories(allCategories)
       setBrands(brandsRes.data || [])
       const sizesData = sizesRes.data || []
       console.log('Loaded sizes:', sizesData)
@@ -403,9 +420,30 @@ const AdminProductForm = () => {
                 className={errors.category_id ? 'error' : ''}
               >
                 <option value="">Выберите категорию</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
+                {categories.map(cat => {
+                  // Get category path for display
+                  const getCategoryDisplayName = (category) => {
+                    if (!category.parent_id) {
+                      return category.name
+                    }
+                    // Find parent in categories list
+                    const parent = categories.find(c => c.id === category.parent_id)
+                    if (parent) {
+                      return `${parent.name} > ${category.name}`
+                    }
+                    // If parent not found, try parent relation
+                    if (category.parent) {
+                      return `${category.parent.name} > ${category.name}`
+                    }
+                    return category.name
+                  }
+                  
+                  return (
+                    <option key={cat.id} value={cat.id}>
+                      {getCategoryDisplayName(cat)}
+                    </option>
+                  )
+                })}
               </select>
               {errors.category_id && <span className="error-text">{errors.category_id[0]}</span>}
             </div>
