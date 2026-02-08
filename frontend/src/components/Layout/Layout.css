@@ -18,9 +18,11 @@
   }
 }
 
-/* Telegram Mini App optimizations */
-.telegram-active .main-content {
-  padding-top: 60px;
-  /* Account for Telegram header */
-  padding-bottom: env(safe-area-inset-bottom, 0);
+/* Telegram Mini App optimizations - only on mobile */
+@media (max-width: 768px) {
+  .telegram-active .main-content {
+    padding-top: 60px;
+    /* Account for Telegram header */
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
 }

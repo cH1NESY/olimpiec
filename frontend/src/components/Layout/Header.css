@@ -71,6 +71,11 @@
   justify-content: center;
 }
 
+/* Desktop: nav wrapper div should not affect layout */
+.nav > div {
+  display: contents;
+}
+
 .nav-link {
   color: var(--gray-dark);
   font-weight: 500;
@@ -238,109 +243,180 @@
   }
 
   .logo-image {
-    height: 36px;
+    height: 40px;
   }
 
   .logo-text {
-    font-size: 16px;
-    letter-spacing: 1px;
+    font-size: 18px;
+    letter-spacing: 1.5px;
   }
 
   .logo-subtitle {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .header-content {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     padding: 12px 0;
     gap: 12px;
+    position: relative;
   }
 
+  /* Hide desktop nav, show mobile menu */
   .nav {
-    position: absolute;
-    top: 100%;
+    position: fixed;
+    top: 0;
     left: 0;
     right: 0;
-    background-color: var(--white);
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-100%);
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s;
-    z-index: 999;
+    transition: opacity 0.3s, visibility 0.3s;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .nav > div {
+    background-color: var(--white);
+    width: 280px;
+    max-width: 80%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 20px 20px;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s;
+    overflow-y: auto;
+    pointer-events: auto;
   }
 
   .nav-open {
-    transform: translateY(0);
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+  }
+
+  .nav-open > div {
+    transform: translateX(0);
   }
 
   .nav-link {
-    padding: 12px 0;
-    font-size: 16px;
+    padding: 16px 0;
+    font-size: 18px;
+    border-bottom: 1px solid var(--border-color);
+    display: block;
+    width: 100%;
+    color: var(--gray-dark);
+  }
+
+  .nav-link:last-child {
+    border-bottom: none;
+  }
+
+  .nav-link::after {
+    display: none;
   }
 
   .menu-toggle {
     display: flex;
+    order: 10;
+    margin-left: 8px;
+    z-index: 1002;
+    position: relative;
+  }
+
+  /* Close button animation in mobile menu */
+  .header.menu-open .menu-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1003;
+    background: var(--white);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  .header.menu-open .menu-toggle span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+    position: absolute;
+  }
+
+  .header.menu-open .menu-toggle span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .header.menu-open .menu-toggle span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+    position: absolute;
   }
 
   .header-actions {
-    order: 3;
-    width: 100%;
-    justify-content: space-between;
-    margin-top: 8px;
+    display: flex;
+    align-items: center;
     gap: 8px;
+    flex: 1;
+    justify-content: flex-end;
   }
 
   .header-icon-box {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
   }
 
   .header-icon {
-    padding: 6px;
+    padding: 8px;
   }
 
   .header-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 }
 
-/* Telegram Mini App specific optimizations */
-.telegram-active .header {
-  padding-top: env(safe-area-inset-top, 0);
-}
+/* Telegram Mini App specific optimizations - only on mobile */
+@media (max-width: 768px) {
+  .telegram-active .header {
+    padding-top: env(safe-area-inset-top, 0);
+  }
 
-.telegram-active .header-content {
-  padding: 10px 0;
-}
+  .telegram-active .header-content {
+    padding: 10px 0;
+  }
 
-.telegram-active .logo-image {
-  height: 32px;
-}
+  .telegram-active .logo-image {
+    height: 32px;
+  }
 
-.telegram-active .logo-text {
-  font-size: 14px;
-}
+  .telegram-active .logo-text {
+    font-size: 14px;
+  }
 
-.telegram-active .logo-subtitle {
-  font-size: 8px;
-}
+  .telegram-active .logo-subtitle {
+    font-size: 8px;
+  }
 
-.telegram-active .header-actions {
-  gap: 6px;
-}
+  .telegram-active .header-actions {
+    gap: 6px;
+  }
 
-.telegram-active .header-icon-box {
-  width: 36px;
-  height: 36px;
-}
+  .telegram-active .header-icon-box {
+    width: 36px;
+    height: 36px;
+  }
 
-.telegram-active .header-icon svg {
-  width: 16px;
-  height: 16px;
+  .telegram-active .header-icon svg {
+    width: 16px;
+    height: 16px;
+  }
 }

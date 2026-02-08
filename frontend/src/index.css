@@ -86,18 +86,20 @@ body {
   }
 }
 
-/* Telegram Mini App optimizations */
-.telegram-active {
-  /* Use safe area insets for Telegram */
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
+/* Telegram Mini App optimizations - only on mobile */
+@media (max-width: 768px) {
+  .telegram-active {
+    /* Use safe area insets for Telegram */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 
-.telegram-active body {
-  /* Prevent zoom on input focus in Telegram */
-  touch-action: manipulation;
+  .telegram-active body {
+    /* Prevent zoom on input focus in Telegram */
+    touch-action: manipulation;
+  }
 }
 
 code {
@@ -133,9 +135,11 @@ input, textarea, select {
   }
 }
 
-/* Telegram Mini App container adjustments */
-.telegram-active .container {
-  padding: 0 12px;
+/* Telegram Mini App container adjustments - only on mobile */
+@media (max-width: 768px) {
+  .telegram-active .container {
+    padding: 0 12px;
+  }
 }
 
 .btn {

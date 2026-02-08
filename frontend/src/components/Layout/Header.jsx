@@ -23,7 +23,7 @@ const Header = () => {
   }
 
   return (
-    <header className="header">
+    <header className={`header ${isMenuOpen ? 'menu-open' : ''}`}>
       <div className="container">
         <div className="header-content">
           <Link to="/" className="logo">
@@ -34,16 +34,26 @@ const Header = () => {
             </div>
           </Link>
 
-          <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
-            <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-              Главная
-            </Link>
-            <Link to="/catalog" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-              Каталог
-            </Link>
-            <Link to="/stores" className="nav-link" onClick={() => setIsMenuOpen(false)}>
-              Магазины
-            </Link>
+          <nav 
+            className={`nav ${isMenuOpen ? 'nav-open' : ''}`} 
+            onClick={(e) => {
+              // Close menu when clicking on overlay (not on menu content)
+              if (e.target === e.currentTarget) {
+                setIsMenuOpen(false)
+              }
+            }}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <Link to="/" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                Главная
+              </Link>
+              <Link to="/catalog" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                Каталог
+              </Link>
+              <Link to="/stores" className="nav-link" onClick={() => setIsMenuOpen(false)}>
+                Магазины
+              </Link>
+            </div>
           </nav>
 
           <div className="header-actions">
